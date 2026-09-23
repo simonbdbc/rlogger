@@ -1,0 +1,52 @@
+{
+  "name": "local-logs-viewer",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "main": "expo-router/entry",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "cargo run --manifest-path ../local-logs-server/Cargo.toml --release --",
+    "dev": "npm run build && cargo run --manifest-path ../local-logs-server/Cargo.toml --",
+    "build": "EXPO_NO_TELEMETRY=1 expo export --platform web",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test shared/*.test.ts",
+    "test:e2e": "cargo build --manifest-path ../local-logs-server/Cargo.toml --offline && cargo build --manifest-path ../local-logs-server/Cargo.toml --offline --example fixtures && playwright test",
+    "format": "prettier --write app e2e src shared '*.json' '*.ts'",
+    "lint": "prettier --check app e2e src shared '*.json' '*.ts'",
+    "fixtures": "cargo run --manifest-path ../local-logs-server/Cargo.toml --example fixtures --"
+  },
+  "dependencies": {
+    "@gluestack-ui/core": "5.0.15",
+    "@gluestack-ui/utils": "^5.0.6",
+    "@types/react": "~19.2.4",
+    "expo": "57.0.20",
+    "expo-constants": "~57.0.17",
+    "expo-linking": "~57.0.9",
+    "expo-router": "~57.0.19",
+    "expo-status-bar": "~57.0.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-reanimated": "^4.5.1",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.26.0",
+    "react-native-web": "^0.21.2",
+    "react-native-worklets": "^0.10.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^24.0.0",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  },
+  "overrides": {
+    "decode-uri-component": "0.5.0",
+    "xcode": {
+      "uuid": "11.1.1"
+    }
+  }
+}

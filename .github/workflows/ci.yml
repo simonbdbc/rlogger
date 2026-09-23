@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_INCREMENTAL: "0"
+
+jobs:
+  crate:
+    name: Rust crate (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Rust 1.95
+        run: |
+          rustup toolchain install 1.95.0 --profile minimal --component clippy,rustfmt
+          rustup default 1.95.0
+      - name: Fetch dependencies
+        run: cargo fetch --locked --manifest-path lib-rust-logger/Cargo.toml
+      - name: Verify crate
+        run: |
+          cargo fmt --check --manifest-path lib-rust-logger/Cargo.toml
+          cargo test --offline --locked --manifest-path lib-rust-logger/Cargo.toml --no-default-features
+          cargo test --offline --locked --manifest-path lib-rust-logger/Cargo.toml --features log
+          cargo test --offline --locked --manifest-path lib-rust-logger/Cargo.toml --all-features
+          cargo clippy --offline --locked --manifest-path lib-rust-logger/Cargo.toml --all-targets --all-features -- -D warnings
+          RUSTDOCFLAGS="-D warnings" cargo doc --offline --locked --manifest-path lib-rust-logger/Cargo.toml --all-features --no-deps
+          cargo package --offline --locked --manifest-path lib-rust-logger/Cargo.toml
+
+  full-project:
+    name: Rust companion and web reader (macOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Rust 1.95
+        run: |
+          rustup toolchain install 1.95.0 --profile minimal --component clippy,rustfmt
+          rustup default 1.95.0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Fetch Rust dependencies
+        run: |
+          cargo fetch --locked --manifest-path lib-rust-logger/Cargo.toml
+          cargo fetch --locked --manifest-path local-logs-server/Cargo.toml
+      - name: Install frontend dependencies and WebKit
+        working-directory: front-react-logger
+        run: |
+          npm ci
+          npm exec playwright -- install webkit
+      - name: Verify full project
+        run: |
+          cargo fmt --check --manifest-path local-logs-server/Cargo.toml
+          cargo test --offline --locked --manifest-path local-logs-server/Cargo.toml --all-features
+          cargo clippy --offline --locked --manifest-path local-logs-server/Cargo.toml --all-targets --all-features -- -D warnings
+          cd front-react-logger
+          npm run typecheck
+          npm run lint
+          npm test
+          npm run build
+          npm run test:e2e

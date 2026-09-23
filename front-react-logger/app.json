@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "Local Logs",
+    "slug": "local-logs",
+    "version": "0.1.0",
+    "scheme": "local-logs",
+    "platforms": ["web"],
+    "web": { "bundler": "metro", "output": "single" },
+    "plugins": ["expo-router"]
+  }
+}

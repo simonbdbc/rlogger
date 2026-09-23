@@ -1,0 +1,4 @@
+RLOG/1 2026-09-08T12:00:00.000+02:00 INFO [LATENCY — 0ms] [seq_first=1 seq_last=2 count=2 last=2026-09-08T12:00:00.000+02:00 instance=test source="fixture:fixture.rs:1" call_id="c1"] A x2
+RLOG/1 2026-09-08T12:00:00.000+02:00 INFO [LATENCY — 0ms] [seq=3 instance=test source="fixture:fixture.rs:1" call_id="c1"] B
+RLOG/1 2026-09-08T12:00:00.000+02:00 INFO [LATENCY — 0ms] [seq_first=4 seq_last=5 count=2 last=2026-09-08T12:00:00.000+02:00 instance=test source="fixture:fixture.rs:1" call_id="c1"] A x2
+RLOG/1 2026-09-08T12:00:00.000+02:00 ERROR [LATENCY — 0ms] [seq=6 instance=test source="fixture:fixture.rs:1" call_id="c1"] Erreur 🦀\nligne\t\u{1b}
