@@ -41,8 +41,11 @@ cd ..
 cargo run --manifest-path local-logs-server/Cargo.toml --release
 ```
 
-Open [Local Logs](http://127.0.0.1:4317), enter `/tmp/rlogger-demo/rlogger`,
-and select a file. New content appears without reloading. The demo prints its
+Open [Local Logs](http://127.0.0.1:4317), select **Journaux RLOGGER** in the side
+menu, enter `/tmp/rlogger-demo/rlogger`, and select a file. Choose **Journaux
+externes** for another application's log directory; this view has no automatic
+maintenance or RLOGGER format warning. New content appears without reloading.
+The demo prints its
 log root and shutdown report. Stop the reader with Ctrl+C; the library and log
 files remain independent.
 
@@ -54,15 +57,17 @@ cargo run --manifest-path lib-rust-logger/Cargo.toml --example workflow -- /tmp/
 
 To try the reader without a producer, run
 `cargo run --manifest-path local-logs-server/Cargo.toml --example fixtures` and
-open the private directory printed by that command. Add `-- --managed` to create
-a RLOGGER storage root for the management demo.
+open the private directory printed by that command under **Journaux externes**.
+Add `-- --managed` to create a RLOGGER storage root for the management demo.
 
 The reader shows file and directory sizes. Explicit file and directory download
 and deletion follow the host filesystem permissions, including for generic log
 roots; directory downloads use uncompressed TAR. Hidden entries are omitted
 from the tree but included in parent sizes and recursive actions. RLOGGER's
 automatic recovery and empty-day cleanup require an eligible private RLOGGER
-root. See the [current action contract](docs/11-actions-fichiers-dossiers.md)
+root and the RLOGGER mode. External mode disables automatic maintenance in the
+Rust companion even when pointed at a valid RLOGGER root. Each mode remembers
+its own last directory. See the [current action contract](docs/11-actions-fichiers-dossiers.md)
 and [compatibility notes](docs/COMPATIBILITE.md).
 
 ## Develop and verify

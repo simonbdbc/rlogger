@@ -10,6 +10,10 @@ et le nettoyage des anciennes journées vides si cette racine et les fichiers
 `.rlogger`, `format` et `gate` appartiennent au compte courant, ne sont pas
 modifiables par les autres comptes et n’ont pas d’ACL macOS étendue. Sinon,
 seule cette maintenance automatique est désactivée.
+Le lecteur transmet `maintenance: false` dans `POST /api/v1/roots` pour un dossier
+externe. Ce choix désactive aussi la récupération et le nettoyage côté Rust si
+le chemin sélectionné ressemble à une racine RLOGGER valide ; le champ omis garde
+le comportement historique (`true`). Les inventaires restent disponibles.
 Les fichiers non vides ne sont jamais
 supprimés automatiquement. Le module `actions.rs` permet les téléchargements et
 suppressions explicites de fichiers réguliers et dossiers dans toute racine ouverte,

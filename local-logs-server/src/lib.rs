@@ -455,13 +455,26 @@ async fn handle(app: Arc<App>, request: Request) -> Result<Response> {
                     )
                 })?
                 .to_owned();
+            let maintenance = match json.get("maintenance") {
+                None | Some(Value::Bool(true)) => true,
+                Some(Value::Bool(false)) => false,
+                _ => {
+                    return Err(Error::new(
+                        "INVALID_REQUEST",
+                        "Le paramètre maintenance doit être un booléen.",
+                        400,
+                    ));
+                }
+            };
             let manager = app.clone();
             let current = session.clone();
             return Ok(Json(
                 disk(session, move |d| {
                     let opened = FileRoot::create(&path)?;
-                    let dto = opened.dto();
-                    let job = manager.management.get(opened.absolute().to_owned());
+                    let dto = opened.dto(maintenance);
+                    let job = manager
+                        .management
+                        .get_with_maintenance(opened.absolute().to_owned(), maintenance);
                     job.kick(false);
                     d.root = Some(opened);
                     d.job = Some(job);

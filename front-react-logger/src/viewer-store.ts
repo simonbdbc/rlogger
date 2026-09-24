@@ -32,6 +32,7 @@ export interface ViewState {
   version: number;
   prependedRows: number;
 }
+export type SourceMode = "rlogger" | "external";
 export class ViewerStore {
   private state: ViewState = {
     inventory: null,
@@ -60,6 +61,10 @@ export class ViewerStore {
   private bytes = new ByteWindow();
   private revision = 0;
   private rootRevision = 0;
+  private serverRootId: string | null = null;
+  private activeMode: SourceMode = "rlogger";
+  private opening?: Promise<void>;
+  private closing?: Promise<void>;
   private cursor = "0";
   private socket?: WebSocket;
   private retry?: ReturnType<typeof setTimeout>;
@@ -185,7 +190,9 @@ export class ViewerStore {
       });
       if (health.serverId !== this.api.serverId || session.status === 401) {
         const previous = this.state.root?.absolutePath;
+        const mode = this.activeMode;
         await this.api.initialize();
+        this.serverRootId = null;
         this.bytes = new ByteWindow();
         this.revision++;
         this.update({
@@ -197,7 +204,7 @@ export class ViewerStore {
           status: "Nouvelle session : racine revalidée",
         });
         this.connect();
-        if (previous) await this.open(previous);
+        if (previous) await this.open(previous, mode);
       } else this.connect();
     } catch {
       this.retry = setTimeout(
@@ -257,16 +264,41 @@ export class ViewerStore {
     } else if (message.type === "subscribed")
       this.update({ status: "En direct" });
   }
-  async open(absolutePath: string) {
-    await this.initialize();
+  open(absolutePath: string, mode: SourceMode = "rlogger") {
     const operation = ++this.rootRevision;
+    const work = this.openCurrent(absolutePath, mode, operation);
+    this.opening = work;
+    void work.then(
+      () => {
+        if (this.opening === work) this.opening = undefined;
+      },
+      () => {
+        if (this.opening === work) this.opening = undefined;
+      },
+    );
+    return work;
+  }
+  private async openCurrent(
+    absolutePath: string,
+    mode: SourceMode,
+    operation: number,
+  ) {
+    if (this.closing) await this.closing;
+    if (operation !== this.rootRevision || this.stopped) return;
+    await this.initialize();
+    if (operation !== this.rootRevision || this.stopped) return;
     this.update({ loading: true, error: "" });
     try {
       const root = await this.api.request<Root>("/api/v1/roots", {
         method: "POST",
-        body: JSON.stringify({ absolutePath }),
+        body: JSON.stringify({
+          absolutePath,
+          maintenance: mode === "rlogger",
+        }),
       });
+      this.serverRootId = root.rootId;
       if (operation !== this.rootRevision || this.stopped) return;
+      this.activeMode = mode;
       this.revision++;
       this.send({ type: "unsubscribe" });
       this.bytes = new ByteWindow();
@@ -287,7 +319,7 @@ export class ViewerStore {
         status: "Choisissez un fichier",
       });
       try {
-        localStorage.setItem("local-logs-path", root.absolutePath);
+        localStorage.setItem(`local-logs-path-${mode}`, root.absolutePath);
       } catch {}
       await this.loadBranch(root.nodeId);
       void this.statistics(true);
@@ -298,6 +330,66 @@ export class ViewerStore {
     } finally {
       if (operation === this.rootRevision) this.update({ loading: false });
     }
+  }
+  closeRoot() {
+    const operation = ++this.rootRevision;
+    this.revision++;
+    this.send({ type: "unsubscribe" });
+    this.bytes = new ByteWindow();
+    this.cursor = "0";
+    if (this.inventoryTimer) clearTimeout(this.inventoryTimer);
+    this.update({
+      root: null,
+      inventory: null,
+      actionBusy: false,
+      selected: null,
+      branches: new Map(),
+      opened: new Set(),
+      treeErrors: new Map(),
+      text: "",
+      start: "0",
+      end: "0",
+      error: "",
+      status: "Choisissez un dossier",
+      loading: true,
+      following: true,
+      newer: false,
+      evicted: false,
+      invalidUtf8: false,
+      prependedRows: 0,
+    });
+    const pending = this.opening;
+    const previousClose = this.closing;
+    const work = (async () => {
+      if (previousClose) await previousClose;
+      if (pending) await pending;
+      const rootId = this.serverRootId;
+      if (rootId) {
+        try {
+          await this.api.request(`/api/v1/roots/${rootId}`, {
+            method: "DELETE",
+          });
+        } catch (e) {
+          if (
+            operation === this.rootRevision &&
+            (!(e instanceof ApiError) || e.code !== "SESSION_EXPIRED")
+          )
+            this.update({ error: (e as Error).message });
+        }
+        if (this.serverRootId === rootId) this.serverRootId = null;
+      }
+      if (operation === this.rootRevision) this.update({ loading: false });
+    })();
+    this.closing = work;
+    void work.then(
+      () => {
+        if (this.closing === work) this.closing = undefined;
+      },
+      () => {
+        if (this.closing === work) this.closing = undefined;
+      },
+    );
+    return work;
   }
   async loadBranch(id: string, more = false) {
     const root = this.state.root;

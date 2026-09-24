@@ -50,6 +50,50 @@ const selectedAction = (page: Page, action: string) =>
     .getByRole("button", { name: new RegExp("^" + action + " le fichier ") });
 const content = (page: Page) =>
   page.getByLabel("Contenu du fichier", { exact: true });
+test("source menu keeps separate paths and omits maintenance warning for external logs", async ({
+  page,
+}) => {
+  const rlogger = page.getByRole("button", { name: /Journaux RLOGGER/ });
+  const external = page.getByRole("button", { name: /Journaux externes/ });
+  await expect(rlogger).toHaveAttribute("aria-current", "page");
+  await open(page);
+  await expect(
+    page.getByText("Maintenance automatique RLOGGER indisponible.", {
+      exact: false,
+    }),
+  ).toBeVisible();
+  await external.click();
+  await expect(external).toHaveAttribute("aria-current", "page");
+  await expect(
+    page.getByRole("treeitem", { name: "a.log", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByText("Maintenance automatique RLOGGER indisponible.", {
+      exact: false,
+    }),
+  ).toHaveCount(0);
+  const request = page.waitForRequest(
+    (candidate) =>
+      candidate.url().endsWith("/api/v1/roots") &&
+      candidate.method() === "POST" &&
+      candidate.postDataJSON()?.maintenance === false,
+  );
+  await open(page);
+  await request;
+  await expect(
+    page.getByText("Maintenance automatique RLOGGER indisponible.", {
+      exact: false,
+    }),
+  ).toHaveCount(0);
+  await rlogger.click();
+  await expect(
+    page.getByRole("textbox", { name: "Dossier local" }),
+  ).toHaveValue(dir);
+  await external.click();
+  await expect(
+    page.getByRole("textbox", { name: "Dossier local" }),
+  ).toHaveValue(dir);
+});
 test("path, empty state, real append, error and raw HTML remain distinct", async ({
   page,
 }) => {

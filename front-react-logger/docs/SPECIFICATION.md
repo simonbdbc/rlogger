@@ -15,7 +15,10 @@ Un actif publié conserve ID, sélection et fenêtre ; aucun segment suivant con
 Les erreurs conservent l’entrée ; les récupérés sont identifiés. La maintenance
 automatique n’efface que les dossiers anciens vides et récupère sous bail OS pour
 une racine RLOGGER 2 privée. Une racine non privée reste consultable, avec raison
-visible de la désactivation. Les rafraîchissements manuels de l’inventaire sont
+visible de la désactivation dans le parcours RLOGGER. Le parcours externe ne
+demande jamais cette maintenance et ne montre pas cet avertissement. Les deux
+parcours ont des chemins mémorisés distincts et changent de racine explicitement.
+Les rafraîchissements manuels de l’inventaire sont
 limités à un nouveau scan par racine toutes les 60 secondes.
 
 ## Périmètre de la première livraison

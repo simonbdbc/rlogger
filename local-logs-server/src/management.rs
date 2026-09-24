@@ -244,12 +244,17 @@ pub struct Inventory {
     pub notices: Vec<String>,
 }
 #[derive(Default)]
-pub struct Hub(Mutex<HashMap<PathBuf, Weak<Job>>>);
+pub struct Hub(Mutex<HashMap<(PathBuf, bool), Weak<Job>>>);
 impl Hub {
     pub fn get(&self, path: PathBuf) -> Arc<Job> {
+        self.get_with_maintenance(path, true)
+    }
+    pub fn get_with_maintenance(&self, path: PathBuf, maintenance: bool) -> Arc<Job> {
         let mut jobs = self.0.lock().unwrap();
         jobs.retain(|_, j| j.strong_count() > 0);
-        if let Some(job) = jobs.get(&path).and_then(Weak::upgrade)
+        if let Some(job) = jobs
+            .get(&(path.clone(), maintenance))
+            .and_then(Weak::upgrade)
             && job.valid()
         {
             return job;
@@ -258,6 +263,7 @@ impl Hub {
             identity: fs::metadata(&path).ok(),
             directory: storage::RootDir::open(&path).ok(),
             path,
+            maintenance,
             snapshot: Mutex::new(Inventory::default()),
             running: AtomicBool::new(false),
             dirty: AtomicBool::new(false),
@@ -265,12 +271,13 @@ impl Hub {
             #[cfg(test)]
             scan_runs: std::sync::atomic::AtomicUsize::new(0),
         });
-        jobs.insert(job.path.clone(), Arc::downgrade(&job));
+        jobs.insert((job.path.clone(), maintenance), Arc::downgrade(&job));
         job
     }
 }
 pub struct Job {
     path: PathBuf,
+    maintenance: bool,
     identity: Option<Metadata>,
     directory: Option<storage::RootDir>,
     snapshot: Mutex<Inventory>,
@@ -330,10 +337,11 @@ impl Job {
                 result: Inventory::default(),
                 now: now(),
                 today: chrono::Local::now().date_naive(),
-                managed: job
-                    .directory
-                    .as_ref()
-                    .is_some_and(|d| managed_reason(&job.path, d).is_ok()),
+                managed: job.maintenance
+                    && job
+                        .directory
+                        .as_ref()
+                        .is_some_and(|d| managed_reason(&job.path, d).is_ok()),
             };
             if valid {
                 scan.directory(Path::new(""), 0);

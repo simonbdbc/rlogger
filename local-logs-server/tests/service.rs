@@ -172,6 +172,69 @@ async fn open(s: &Service, token: &str, dir: &str) -> (Value, Value, Value) {
     .unwrap();
     (root, file, content)
 }
+#[tokio::test]
+async fn external_request_keeps_a_valid_rlogger_root_unmanaged() {
+    let temp = tempfile::tempdir().unwrap();
+    let root = temp.path().join("rlogger");
+    rlogger::storage::initialize(&root).unwrap();
+    rlogger::storage::open_file(&rlogger::storage::lease_path(&root, "1-2-3"), true, true).unwrap();
+    let folder = root.join("1970-01-01/test");
+    fs::create_dir_all(&folder).unwrap();
+    let active = folder.join("app-00-1-2-3-h0-s1.active.log");
+    fs::write(&active, "unfinished\n").unwrap();
+    let s = service().await;
+    let token = session(&s).await;
+    let response = request(
+        &s,
+        &token,
+        reqwest::Method::POST,
+        "/api/v1/roots",
+        json!({"absolutePath": root, "maintenance": false}),
+    )
+    .await;
+    assert_eq!(response.status(), 200);
+    let opened = response.json::<Value>().await.unwrap();
+    assert_eq!(
+        opened["managedReason"],
+        "Maintenance désactivée pour cette ouverture."
+    );
+    let endpoint = format!(
+        "/api/v1/roots/{}/statistics",
+        opened["rootId"].as_str().unwrap()
+    );
+    tokio::time::timeout(Duration::from_secs(5), async {
+        loop {
+            let snapshot = request(&s, &token, reqwest::Method::GET, &endpoint, Value::Null)
+                .await
+                .json::<Value>()
+                .await
+                .unwrap();
+            if !snapshot["sampledAt"].as_str().unwrap_or("").is_empty()
+                && snapshot["busy"].as_bool() == Some(false)
+            {
+                break;
+            }
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+    })
+    .await
+    .unwrap();
+    assert!(active.exists());
+    assert!(!folder.join("app-00-1-2-3-h0-s1.recovered.log").exists());
+    assert_eq!(
+        request(
+            &s,
+            &token,
+            reqwest::Method::POST,
+            "/api/v1/roots",
+            json!({"absolutePath": root, "maintenance": "no"}),
+        )
+        .await
+        .status(),
+        400
+    );
+    s.close().await;
+}
 type Socket =
     tokio_tungstenite::WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>;
 async fn socket(s: &Service, token: &str) -> Socket {

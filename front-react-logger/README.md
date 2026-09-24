@@ -13,7 +13,15 @@ npm run build
 npm start
 ```
 
-Ouvrir `http://127.0.0.1:4317`, saisir un chemin absolu puis **Ouvrir** ou Entrée.
+Ouvrir `http://127.0.0.1:4317`, choisir **Journaux RLOGGER** ou
+**Journaux externes** dans le menu latéral, saisir un chemin absolu puis
+**Ouvrir** ou Entrée. Le premier parcours attend la racine privée `…/rlogger`
+et permet sa maintenance automatique lorsqu’elle est reconnue. Le second sert
+aux dossiers d’applications tierces (par exemple MotiveWave) : consultation,
+téléchargement et suppression explicite restent disponibles, sans maintenance
+automatique ni avertissement lié au format RLOGGER. Le compagnon applique aussi
+ce choix ; ouvrir une racine RLOGGER dans le parcours externe ne lance pas sa
+maintenance.
 La commande `pwd` exécutée dans le dossier de logs donne ce chemin. Le build et
 ses polices système/assets sont locaux ; après installation et build, la lecture
 fonctionne sans internet. Aucun tunnel, CDN ou déploiement.
@@ -36,7 +44,8 @@ Le générateur préserve les fixtures existantes, sauf le fichier synthétique 
 explicitement régénéré avec `--large`. Un dossier fourni doit déjà exister,
 appartenir au compte courant, être privé et ne contenir aucun lien symbolique.
 
-Pour la fixture gérée, ouvrir le sous-dossier `rlogger` du chemin affiché.
+Pour la fixture gérée, choisir **Journaux RLOGGER** puis ouvrir le sous-dossier
+`rlogger` du chemin affiché.
 
 ## Lire
 
@@ -58,8 +67,10 @@ Pour la fixture gérée, ouvrir le sous-dossier `rlogger` du chemin affiché.
   caractères coupés entre blocs conservés pour l’append suivant.
 - Flèches haut/bas, Home/End et Entrée permettent de parcourir l’arbre ; gauche/droite
   replient/déplient un dossier. Le séparateur se règle au pointeur ou au clavier.
-- Dernier chemin et largeur sont enregistrés dans le navigateur, jamais le contenu.
-  Les préférences peuvent être réinitialisées. Le chemin reste à revalider par Ouvrir.
+- Chaque parcours mémorise son dernier chemin ; le choix du parcours et la largeur
+  sont également enregistrés dans le navigateur, jamais le contenu. Changer de
+  parcours ferme la racine affichée ; cliquer sur **Ouvrir** pour revalider le
+  chemin mémorisé. Les préférences peuvent être réinitialisées.
 
 La disparition d’un fichier est signalée et le chemin reste observé. Troncature ou
 remplacement détecté : nouveau snapshot, sans fusion des générations. Après coupure
@@ -88,9 +99,10 @@ La confirmation modale garde le focus et accepte Échap ; une erreur conserve l�
 Un renommage actif → finalisé/récupéré conserve la sélection et sa fenêtre, sans
 concaténer un autre segment.
 
-Récupération des actifs abandonnés et suppression des vieux dossiers réellement
-vides à l’ouverture, après suppression et toutes les 60 s tant que la racine est
-ouverte. Les octets présents sont conservés, y compris une dernière ligne incomplète ;
+Dans le parcours RLOGGER, récupération des actifs abandonnés et suppression des
+vieux dossiers réellement vides à l’ouverture, après suppression et toutes les
+60 s tant que la racine privée est ouverte. Les octets présents sont conservés,
+y compris une dernière ligne incomplète ;
 les buffers perdus avant écriture disque sont irrécupérables. Ni rétention de logs,
 compression, ni surveillance persistante. Voir le [contrat](../docs/09-migration-arborescence-rlogger.md).
 

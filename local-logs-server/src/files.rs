@@ -191,12 +191,16 @@ impl FileRoot {
             generations: HashMap::new(),
         })
     }
-    pub fn dto(&self) -> RootDto {
+    pub fn dto(&self, maintenance: bool) -> RootDto {
         RootDto {
             root_id: self.id.clone(),
             node_id: self.node_id.clone(),
             absolute_path: self.absolute.to_string_lossy().into_owned(),
-            managed_reason: crate::management::managed_reason(&self.absolute, &self.root).err(),
+            managed_reason: if maintenance {
+                crate::management::managed_reason(&self.absolute, &self.root).err()
+            } else {
+                Some("Maintenance désactivée pour cette ouverture.".into())
+            },
         }
     }
     fn node(&self, id: &str, kind: Option<Kind>) -> Result<&Node> {

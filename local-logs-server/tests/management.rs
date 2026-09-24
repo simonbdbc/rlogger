@@ -33,6 +33,37 @@ async fn inventory(root: &Path) -> management::Inventory {
     .unwrap();
     job.snapshot()
 }
+#[tokio::test]
+async fn external_opening_never_runs_automatic_maintenance() {
+    let (_temp, root, path) = fixture();
+    let active = path.with_file_name(
+        path.file_name()
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .replace(".log", ".active.log"),
+    );
+    fs::rename(root.join(&path), root.join(&active)).unwrap();
+    let hub = Hub::default();
+    let external = hub.get_with_maintenance(root.clone(), false);
+    let managed = hub.get(root.clone());
+    assert!(!std::sync::Arc::ptr_eq(&external, &managed));
+    external.kick(false);
+    tokio::time::timeout(Duration::from_secs(5), async {
+        while external.snapshot().sampled_at.is_empty() || external.snapshot().busy {
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+    })
+    .await
+    .unwrap();
+    assert!(root.join(&active).exists());
+    assert!(
+        external
+            .snapshot()
+            .items
+            .contains_key(&active.to_string_lossy().to_string())
+    );
+}
 #[test]
 fn eligibility_and_download_lock_use_current_identity() {
     let (_temp, root, path) = fixture();

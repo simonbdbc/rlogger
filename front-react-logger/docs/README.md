@@ -4,7 +4,10 @@ Lecteur/compagnon 0.3.0 : consultation générique, actions explicites sur les
 fichiers et dossiers, et maintenance du stockage horaire privé.
 [Guide utilisateur](../README.md), [contrat actuel des actions](../../docs/11-actions-fichiers-dossiers.md).
 
-Le lecteur Expo/gluestack ouvre un dossier local à partir de son chemin absolu,
+Le menu du lecteur Expo/gluestack sépare les racines privées RLOGGER, avec
+maintenance automatique sous conditions, des dossiers externes, sans maintenance
+ni avertissement RLOGGER. Chaque parcours conserve son propre chemin.
+Le lecteur ouvre un dossier local à partir de son chemin absolu,
 affiche son arborescence à gauche et suit le contenu du fichier cliqué à droite.
 Il est accompagné d’un service local de lecture ; cette démo ne prévoit ni compte
 ni authentification utilisateur. Le jeton de session opaque ne prouve pas

@@ -25,7 +25,7 @@ point d’entrée et empêcher l’accès direct au compagnon depuis des clients
 | Santé | `GET /api/v1/health` | `version`, `serverId` |
 | Nouvelle session | `POST /api/v1/session`, Origin requis | Jeton opaque, version et identité du serveur |
 | Valider / fermer une session | `GET` / `DELETE /api/v1/session` | Session active / fermeture des ressources |
-| Racine | `POST /api/v1/roots`, `{absolutePath}` | `rootId`, `nodeId`, chemin canonique, `managedReason` nullable |
+| Racine | `POST /api/v1/roots`, `{absolutePath, maintenance?: boolean}` | `rootId`, `nodeId`, chemin canonique, `managedReason` nullable |
 | Enfants | `GET /api/v1/roots/{rootId}/entries?parentId=…&cursor=…` | Entrées, révision et cursor suivant |
 | Tranche | `GET /api/v1/roots/{rootId}/files/{fileId}/content` | Fin du fichier par défaut |
 | Historique / reprise | Même route, `before=…` ou `after=…`, `generation=…` | Intervalle contigu de la génération demandée |
@@ -36,6 +36,15 @@ Le jeton HTTP passe dans `x-local-session`. Les IDs opaques proviennent de l’a
 un chemin arbitraire n’est accepté qu’à l’ouverture de racine. JSON d’erreur :
 `code` et `message`, avec statut HTTP. NOT_FOUND, PERMISSION, ROOT_CHANGED,
 GENERATION_CHANGED, CURSOR_INVALID, FORBIDDEN, LIMIT et SESSION_EXPIRED sont distincts.
+
+Le menu **Journaux RLOGGER** envoie `maintenance: true`, le menu **Journaux
+externes** envoie `maintenance: false`. L’absence du champ conserve le comportement
+historique (`true`). La maintenance automatique exige à la fois ce choix et la
+validation de la racine privée RLOGGER v2. Les inventaires restent disponibles
+dans les deux parcours ; les tâches d’inventaire sont distinctes selon ce choix,
+afin qu’une consultation externe ne déclenche aucune récupération ni nettoyage.
+Le changement de parcours ferme la racine courante via `DELETE`, puis demande une
+nouvelle ouverture explicite du chemin mémorisé pour ce parcours.
 
 ## Snapshot, flux et reprise
 
