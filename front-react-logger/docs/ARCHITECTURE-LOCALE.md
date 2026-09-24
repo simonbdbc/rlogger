@@ -1,6 +1,7 @@
 # Architecture locale et contrat de lecture v1
 
-Compagnon Rust 0.3.0, logger 0.2.0 ; protocole v1 étendu pour la gestion horaire.
+Lecteur 0.4.0, compagnon Rust 0.3.0, logger 0.2.0 ; protocole v1 étendu pour
+la gestion horaire.
 [Guide de lancement](../README.md), [types partagés](../shared/protocol.ts).
 
 ## Responsabilités et lancement
@@ -8,8 +9,14 @@ Compagnon Rust 0.3.0, logger 0.2.0 ; protocole v1 étendu pour la gestion horair
 Expo web / Router / gluestack composent le lecteur. Le compagnon Rust (Axum/Tokio)
 sert le build et l’API sur `http://127.0.0.1:4317` ; port configurable par environnement.
 `npm run build` puis `npm start`, Ctrl+C pour fermer le service et ses connexions.
-`npm run dev` reconstruit le web puis lance le serveur Rust ; redémarrer après changement du backend. Aucune origine distincte,
-aucun proxy, CDN ou tunnel nécessaire. La crate n’a aucune dépendance à ce service.
+`npm run dev` lance un export Expo, puis le serveur Rust surveille les sources :
+il exporte vers l’un de deux dossiers temporaires ignorés par Git et remplace le
+build servi après un export réussi. Un script injecté seulement dans la page de
+développement consulte `GET /__dev/version` et recharge la page quand la version
+change. En cas d’échec de l’export, la version servie ne change pas. Les appels
+API restent sur la même origine. `npm run preview` effectue un seul export ; un
+changement du backend demande toujours un redémarrage.
+Aucun proxy, CDN ou tunnel nécessaire. La crate n’a aucune dépendance à ce service.
 
 HTTP et WS vérifient Host/Origin exacts ; les opérations sensibles exigent un jeton
 aléatoire propre à chaque onglet. Quatre sessions maximum, une racine et une sélection
@@ -43,8 +50,12 @@ historique (`true`). La maintenance automatique exige à la fois ce choix et la
 validation de la racine privée RLOGGER v2. Les inventaires restent disponibles
 dans les deux parcours ; les tâches d’inventaire sont distinctes selon ce choix,
 afin qu’une consultation externe ne déclenche aucune récupération ni nettoyage.
-Le changement de parcours ferme la racine courante via `DELETE`, puis demande une
-nouvelle ouverture explicite du chemin mémorisé pour ce parcours.
+Le changement de parcours ferme la racine courante via `DELETE`, puis ouvre
+automatiquement le chemin mémorisé pour ce parcours. Au démarrage, le parcours
+sélectionné ouvre aussi son chemin mémorisé. Chaque ouverture revalide la racine
+côté Rust ; un chemin absent ou non autorisé reste affiché avec son erreur.
+Les chemins sont des préférences du navigateur local ; aucun chemin d’application
+tierce n’est fourni par le dépôt.
 
 ## Snapshot, flux et reprise
 
@@ -126,14 +137,15 @@ le texte rendu, jamais sur tout le fichier non chargé.
 
 Le suivi du scroll s’applique seulement en bas. Le clic manuel garde la sélection,
 y compris après rotation. Clavier, séparateur ajustable, panneaux indépendants ;
-à 390 px, arbre au-dessus du lecteur. Chemin et largeur seuls sont mémorisés localement.
+à 390 px, arbre au-dessus du lecteur. Les deux chemins, le parcours sélectionné
+et la largeur sont mémorisés localement.
 FRONT-028–030 (successeur, mode structuré, recherche entière) restent différés.
 Le format RLOG/1 est du texte ordinaire pour ce lecteur.
 
 ## Gestion horaire — extension 0.3.0
 
-Le couple lecteur/compagnon 0.3.0 est requis pour ces DTO additionnels ; HTTP/WS et
-les tranches existantes conservent la version 1. Le logger reste indépendant.
+Le lecteur 0.4.0 utilise le compagnon 0.3.0 pour ces DTO additionnels ; HTTP/WS
+et les tranches existantes conservent la version 1. Le logger reste indépendant.
 
 | Opération | Route | Contrat |
 | --- | --- | --- |

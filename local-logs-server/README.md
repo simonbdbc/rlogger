@@ -1,7 +1,9 @@
 # Compagnon local Rust — 0.3.0
 
 Binaire autonome Rust 1.95+, Axum/Tokio. Il sert le build Expo et lit les fichiers
-sur la même machine. Aucun runtime Node ni Python n’est nécessaire à son exécution.
+sur la même machine. En mode statique, aucun runtime Node ni Python n’est
+nécessaire à son exécution. Le mode `--dev` appelle Expo pour exporter le frontend
+après les changements de source ; il requiert donc Node 24 et les dépendances npm.
 La bibliothèque de journalisation reste indépendante dans `lib-rust-logger`.
 
 Le module `management.rs` gère le stockage horaire version 2 du logger 0.2.0.
@@ -44,6 +46,13 @@ le port ; zéro choisit un port libre pour les tests. `--dist` désigne les asse
 locaux. Ctrl+C ou SIGTERM ferme HTTP, WebSocket et sessions.
 `--poll-ms` règle le rattrapage entre 10 et 5 000 ms (défaut 250 ms).
 
+Pour travailler sur l’interface, lancer `npm run dev` depuis
+`front-react-logger/` : le compagnon surveille les sources Expo, relance leur
+export et recharge la page après un export réussi. `npm run preview` effectue
+un export unique avec le compagnon en mode statique. Les changements du backend
+Rust demandent un redémarrage dans les deux modes. Voir le
+[guide du lecteur](../front-react-logger/README.md).
+
 HTTP `/api/v1` et WS `local-logs.v1` restent compatibles avec le lecteur précédent :
 sessions opaques, racine validée, IDs de nœuds, générations et offsets décimaux.
 Le plafond 2^53−1 est conservé pour la compatibilité du protocole, même si Rust lit
@@ -62,8 +71,9 @@ Une écriture WebSocket bloquée expire après 2 s ; ack absent 10 s : resync/fe
 
 Snapshots 256 Kio, blocs directs 64 Kio ; cache de 10 000 nœuds par session,
 500 entrées/page, 64 branches observées, scans limités à 200 000 entrées/dossier.
-Aucun watcher natif. Un inventaire récursif borné par racine ouverte est mutualisé
-entre sessions et relancé au plus toutes les 60 secondes, y compris après
+Aucun watcher natif sur les journaux consultés. Un inventaire récursif borné par
+racine ouverte est mutualisé entre sessions et relancé au plus toutes les 60
+secondes, y compris après
 `refresh=1`. Une mutation gérée invalide ce cache et regroupe les nouveaux scans.
 Les handles disque sont
 fermés à la fin des opérations. Les lectures système bloquées ne peuvent pas être

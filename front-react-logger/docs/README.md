@@ -1,12 +1,13 @@
 # Documentation du lecteur local
 
-Lecteur/compagnon 0.3.0 : consultation générique, actions explicites sur les
-fichiers et dossiers, et maintenance du stockage horaire privé.
+Lecteur 0.4.0 / compagnon 0.3.0 : consultation générique, actions explicites
+sur les fichiers et dossiers, et maintenance du stockage horaire privé.
 [Guide utilisateur](../README.md), [contrat actuel des actions](../../docs/11-actions-fichiers-dossiers.md).
 
 Le menu du lecteur Expo/gluestack sépare les racines privées RLOGGER, avec
 maintenance automatique sous conditions, des dossiers externes, sans maintenance
 ni avertissement RLOGGER. Chaque parcours conserve son propre chemin.
+Un dossier mémorisé s’ouvre automatiquement quand son parcours est sélectionné.
 Le lecteur ouvre un dossier local à partir de son chemin absolu,
 affiche son arborescence à gauche et suit le contenu du fichier cliqué à droite.
 Il est accompagné d’un service local de lecture ; cette démo ne prévoit ni compte
@@ -42,3 +43,4 @@ d’un journal JSON ou d’une interface structurée avancée.
 - `e2e/` : scénarios WebKit desktop et petite largeur.
 - `../local-logs-server/examples/fixtures.rs` : génération Rust des fichiers synthétiques de démonstration.
 - `dist/` : build Expo généré, servi par npm start.
+- `.local-logs-dev/` : exports temporaires du mode `npm run dev`, ignorés par Git.

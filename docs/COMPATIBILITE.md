@@ -1,4 +1,4 @@
-# Compatibilité — logger 0.2.0 / compagnon et lecteur 0.3.0
+# Compatibilité — logger 0.2.0 / compagnon 0.3.0 / lecteur 0.4.0
 
 > Extension locale du 23 septembre : les actions manuelles couvrent désormais tous
 > les fichiers réguliers et dossiers dans la racine ouverte, avec téléchargement TAR
@@ -16,7 +16,7 @@ décrit les opérations manuelles actuelles.
 | Rust / MSRV | rustc/cargo 1.95.0, édition 2024 ; features optionnelles `log` et `tracing` |
 | Stockage | Marqueur RLOGGER storage 2, rotation horaire obligatoire, segments actifs/finalisés/récupérés |
 | Texte | RLOG/1 inchangé, UTF-8 avec contrôles échappés |
-| Compagnon / frontend | local-logs-server, local-logs-viewer 0.3.0 |
+| Compagnon / frontend | local-logs-server 0.3.0, local-logs-viewer 0.4.0 |
 | Protocole | HTTP /api/v1, WS local-logs.v1 ; extension additive des DTO et routes de gestion |
 | Backend | Rust, Axum 0.8.9 et Tokio ; versions exactes verrouillées dans Cargo.lock |
 | Outillage frontend | Node 24.18.0, npm 11.16.0 ; aucun serveur Node |
@@ -35,9 +35,9 @@ Un finalisé n’est plus rouvert ; une capture tardive crée un nouveau segment
 Aucun déplacement d’anciens logs. Racines génériques et formats historiques :
 lecture, tailles et actions manuelles selon les permissions du système. La
 maintenance automatique exige d’ouvrir exactement la racine RLOGGER 2 privée.
-Le nouveau frontend est livré avec son compagnon 0.3.0 ;
+Le frontend 0.4.0 utilise le compagnon 0.3.0 ;
 les anciennes routes de lecture restent disponibles, mais un ancien compagnon
-ne fournit pas les nouvelles métadonnées au frontend 0.3.0.
+ne fournit pas les nouvelles métadonnées au frontend 0.4.0.
 
 ## Contrôles et périmètre
 

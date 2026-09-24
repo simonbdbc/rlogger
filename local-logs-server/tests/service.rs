@@ -43,6 +43,69 @@ async fn dist_symlink_is_refused_and_index_remains_available() {
     assert_eq!(escaped.status(), 404);
     server.close().await;
 }
+#[tokio::test]
+async fn dev_reload_switches_to_the_completed_export() {
+    let builds = tempfile::tempdir().unwrap();
+    let first = builds.path().join("first");
+    let second = builds.path().join("second");
+    fs::create_dir_all(&first).unwrap();
+    fs::create_dir_all(&second).unwrap();
+    fs::write(first.join("index.html"), "first</body>").unwrap();
+    fs::write(second.join("index.html"), "second</body>").unwrap();
+    let server = start(Options {
+        port: 0,
+        dist: first,
+        dev_reload: true,
+        ..Default::default()
+    })
+    .await
+    .unwrap();
+    let browser = client();
+    let html = browser
+        .get(&server.origin)
+        .send()
+        .await
+        .unwrap()
+        .text()
+        .await
+        .unwrap();
+    assert!(html.starts_with("first"));
+    assert!(html.contains("/__dev/version"));
+    assert_eq!(
+        browser
+            .get(format!("{}/__dev/version", server.origin))
+            .send()
+            .await
+            .unwrap()
+            .text()
+            .await
+            .unwrap(),
+        "0"
+    );
+    server.reload_dist(&second).unwrap();
+    let html = browser
+        .get(&server.origin)
+        .send()
+        .await
+        .unwrap()
+        .text()
+        .await
+        .unwrap();
+    assert!(html.starts_with("second"));
+    assert!(html.contains("/__dev/version"));
+    assert_eq!(
+        browser
+            .get(format!("{}/__dev/version", server.origin))
+            .send()
+            .await
+            .unwrap()
+            .text()
+            .await
+            .unwrap(),
+        "1"
+    );
+    server.close().await;
+}
 
 #[tokio::test]
 async fn thirty_two_http_connections_close_after_their_response() {

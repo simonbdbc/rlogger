@@ -11,7 +11,7 @@ publish = false
 rlogger = { path = "../lib-rust-logger" }
 chrono = { version = "0.4.45", default-features = false, features = ["clock", "std"] }
 axum = { version = "0.8.9", features = ["ws"] }
-tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "sync", "time", "signal", "fs", "io-util"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "sync", "time", "signal", "fs", "io-util", "process"] }
 tokio-util = { version = "0.7", features = ["rt", "io"] }
 hyper-util = { version = "0.1.20", features = ["server-auto", "service", "tokio"] }
 serde = { version = "1", features = ["derive"] }

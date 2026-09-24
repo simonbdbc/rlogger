@@ -24,10 +24,11 @@ use rlogger::storage::RootDir;
 use serde_json::{Value, json};
 use std::{
     collections::{BTreeMap, HashMap},
+    io,
     path::{Path, PathBuf},
     pin::Pin,
     sync::{
-        Arc, Mutex,
+        Arc, Mutex, RwLock,
         atomic::{AtomicBool, AtomicU64, Ordering},
     },
     task::{Context, Poll},
@@ -45,6 +46,7 @@ use tokio_util::{io::ReaderStream, task::TaskTracker};
 pub struct Options {
     pub port: u16,
     pub dist: PathBuf,
+    pub dev_reload: bool,
     pub poll: Duration,
     pub ack_timeout: Duration,
     pub session_ttl: Duration,
@@ -55,6 +57,7 @@ impl Default for Options {
         Self {
             port: 4317,
             dist: Path::new(env!("CARGO_MANIFEST_DIR")).join("../front-react-logger/dist"),
+            dev_reload: false,
             poll: Duration::from_millis(250),
             ack_timeout: Duration::from_secs(10),
             session_ttl: Duration::from_secs(120),
@@ -94,7 +97,8 @@ struct Session {
 }
 struct App {
     options: Options,
-    dist: Option<RootDir>,
+    dist: RwLock<Option<RootDir>>,
+    dev_version: AtomicU64,
     host: String,
     origin: String,
     id: String,
@@ -137,6 +141,13 @@ pub struct Service {
     task: Option<JoinHandle<()>>,
 }
 impl Service {
+    pub fn reload_dist(&self, path: &Path) -> io::Result<()> {
+        let dist = RootDir::open(path)?;
+        *self.app.dist.write().unwrap() = Some(dist);
+        self.app.dev_version.fetch_add(1, Ordering::Release);
+        Ok(())
+    }
+
     pub async fn close(mut self) {
         self.app.stop.send_replace(true);
         if let Some(task) = self.task.take() {
@@ -188,7 +199,8 @@ pub async fn start(options: Options) -> std::io::Result<Service> {
     let (stop, _) = watch::channel(false);
     let app = Arc::new(App {
         options,
-        dist,
+        dist: RwLock::new(dist),
+        dev_version: AtomicU64::new(0),
         host,
         origin: origin.clone(),
         id: id(),
@@ -329,6 +341,9 @@ async fn handle(app: Arc<App>, request: Request) -> Result<Response> {
     guard(&app, request.headers(), false)?;
     let method = request.method().clone();
     let pathname = request.uri().path().to_owned();
+    if app.options.dev_reload && pathname == "/__dev/version" && method == Method::GET {
+        return Ok((app.dev_version.load(Ordering::Acquire).to_string()).into_response());
+    }
     if pathname == "/api/v1/health" && method == Method::GET {
         return Ok(Json(json!({"version":1,"serverId":app.id})).into_response());
     }
@@ -640,22 +655,24 @@ async fn handle(app: Arc<App>, request: Request) -> Result<Response> {
     {
         return Err(Error::new("FORBIDDEN", "Asset refusé.", 403));
     }
-    let dist = app
-        .dist
-        .as_ref()
-        .ok_or_else(|| Error::new("NOT_FOUND", "Build absent : exécutez npm run build.", 404))?;
-    let target = if decoded == "/"
-        || relative.extension().is_none()
-        || dist.open_directory(relative).is_ok()
-    {
-        Path::new("index.html")
-    } else {
-        relative
+    let (target, file) = {
+        let dist = app.dist.read().unwrap();
+        let dist = dist.as_ref().ok_or_else(|| {
+            Error::new("NOT_FOUND", "Build absent : exécutez npm run build.", 404)
+        })?;
+        let target = if decoded == "/"
+            || relative.extension().is_none()
+            || dist.open_directory(relative).is_ok()
+        {
+            PathBuf::from("index.html")
+        } else {
+            relative.to_path_buf()
+        };
+        let file = dist
+            .open_file(&target)
+            .map_err(|_| Error::new("NOT_FOUND", "Build absent ou asset refusé.", 404))?;
+        (target, tokio::fs::File::from_std(file))
     };
-    let file = dist
-        .open_file(target)
-        .map_err(|_| Error::new("NOT_FOUND", "Build absent ou asset refusé.", 404))?;
-    let file = tokio::fs::File::from_std(file);
     let mime = match target.extension().and_then(|e| e.to_str()).unwrap_or("") {
         "html" => "text/html; charset=utf-8",
         "js" => "text/javascript; charset=utf-8",
@@ -669,11 +686,43 @@ async fn handle(app: Arc<App>, request: Request) -> Result<Response> {
     };
     let body = if method == Method::HEAD {
         Body::empty()
+    } else if app.options.dev_reload && target == Path::new("index.html") {
+        let mut file = file;
+        let mut html = String::new();
+        file.read_to_string(&mut html)
+            .await
+            .map_err(|_| Error::new("NOT_FOUND", "Build HTML illisible.", 404))?;
+        if let Some(at) = html.rfind("</body>") {
+            html.insert_str(at, DEV_RELOAD_SCRIPT);
+        } else {
+            html.push_str(DEV_RELOAD_SCRIPT);
+        }
+        Body::from(html)
     } else {
         Body::from_stream(ReaderStream::new(file))
     };
     Ok((StatusCode::OK, [(header::CONTENT_TYPE, mime)], body).into_response())
 }
+const DEV_RELOAD_SCRIPT: &str = r#"<script>
+(() => {
+  let current;
+  async function poll() {
+    try {
+      const response = await fetch("/__dev/version", { cache: "no-store" });
+      if (response.ok) {
+        const next = await response.text();
+        if (current !== undefined && next !== current) {
+          location.reload();
+          return;
+        }
+        current = next;
+      }
+    } catch {}
+    setTimeout(poll, 750);
+  }
+  poll();
+})();
+</script>"#;
 async fn send(socket: &mut WebSocket, message: Value) -> bool {
     tokio::time::timeout(
         Duration::from_secs(2),

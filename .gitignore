@@ -2,6 +2,7 @@
 **/node_modules/
 **/dist/
 **/.expo/
+/front-react-logger/.local-logs-dev/
 **/coverage/
 .DS_Store
 output/

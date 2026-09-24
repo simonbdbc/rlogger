@@ -1,6 +1,7 @@
 # Spécification fonctionnelle du lecteur local
 
-Socle initial conservé, extension 0.3.0 décrite dans
+Lecteur 0.4.0 : socle initial conservé. L’extension du protocole 0.3.0 est
+décrite dans
 l’[architecture livrée](ARCHITECTURE-LOCALE.md#gestion-horaire--extension-030),
 le [guide](../README.md) et le [contrat actuel des actions](../../docs/11-actions-fichiers-dossiers.md).
 
@@ -17,7 +18,8 @@ automatique n’efface que les dossiers anciens vides et récupère sous bail OS
 une racine RLOGGER 2 privée. Une racine non privée reste consultable, avec raison
 visible de la désactivation dans le parcours RLOGGER. Le parcours externe ne
 demande jamais cette maintenance et ne montre pas cet avertissement. Les deux
-parcours ont des chemins mémorisés distincts et changent de racine explicitement.
+parcours ont des chemins mémorisés distincts ; sélectionner une entrée ferme la
+racine précédente puis ouvre automatiquement son dossier configuré.
 Les rafraîchissements manuels de l’inventaire sont
 limités à un nouveau scan par racine toutes les 60 secondes.
 
@@ -47,9 +49,10 @@ vers un service tiers n’est inclus.
   Ne pas interpréter `pwd`, `$(...)`, variables ou commandes shell. L’utilisateur
   colle le résultat de `pwd`, pas la commande.
 
-Le dernier chemin et la largeur des panneaux sont mémorisés localement. Aucun contenu
-de log n’est persisté dans le stockage du navigateur par défaut. Un dossier
-mémorisé doit être revalidé à l’ouverture.
+Chaque parcours mémorise son dernier chemin ; le parcours choisi et la largeur
+des panneaux sont aussi mémorisés localement. Aucun contenu de log n’est persisté
+dans le stockage du navigateur par défaut. Le dossier mémorisé est automatiquement
+revalidé à son ouverture.
 
 ### Arborescence gauche
 

@@ -107,7 +107,7 @@ export function Tree({
   return (
     <aside className="tree-panel" aria-label="Fichiers locaux">
       <div className="tree-toolbar">
-        <h2>Fichiers</h2>
+        <h4>Fichiers</h4>
         <Action disabled={!state.root} onPress={() => void store.refresh()}>
           ↻ Actualiser
         </Action>

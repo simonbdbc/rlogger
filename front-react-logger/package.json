@@ -1,6 +1,6 @@
 {
   "name": "local-logs-viewer",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
   "main": "expo-router/entry",
@@ -9,7 +9,8 @@
   },
   "scripts": {
     "start": "cargo run --manifest-path ../local-logs-server/Cargo.toml --release --",
-    "dev": "npm run build && cargo run --manifest-path ../local-logs-server/Cargo.toml --",
+    "dev": "cargo run --manifest-path ../local-logs-server/Cargo.toml -- --dev",
+    "preview": "npm run build && cargo run --manifest-path ../local-logs-server/Cargo.toml --",
     "build": "EXPO_NO_TELEMETRY=1 expo export --platform web",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test shared/*.test.ts",

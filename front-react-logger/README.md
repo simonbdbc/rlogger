@@ -1,4 +1,4 @@
-# Local Logs
+# Local Logs — lecteur 0.4.0
 
 Lecteur local Expo web, gluestack et compagnon Rust. Aucun compte ni backend
 métier : un chemin absolu, un arbre, le fichier sélectionné et ses ajouts en direct.
@@ -13,11 +13,18 @@ npm run build
 npm start
 ```
 
+Pour modifier l’interface, arrêter d’abord tout lecteur déjà lancé sur le port
+4317, puis exécuter dans ce dossier :
+
+```sh
+npm run dev
+```
+
 Ouvrir `http://127.0.0.1:4317`, choisir **Journaux RLOGGER** ou
 **Journaux externes** dans le menu latéral, saisir un chemin absolu puis
 **Ouvrir** ou Entrée. Le premier parcours attend la racine privée `…/rlogger`
 et permet sa maintenance automatique lorsqu’elle est reconnue. Le second sert
-aux dossiers d’applications tierces (par exemple MotiveWave) : consultation,
+aux dossiers d’applications tierces : consultation,
 téléchargement et suppression explicite restent disponibles, sans maintenance
 automatique ni avertissement lié au format RLOGGER. Le compagnon applique aussi
 ce choix ; ouvrir une racine RLOGGER dans le parcours externe ne lance pas sa
@@ -26,8 +33,22 @@ La commande `pwd` exécutée dans le dossier de logs donne ce chemin. Le build e
 ses polices système/assets sont locaux ; après installation et build, la lecture
 fonctionne sans internet. Aucun tunnel, CDN ou déploiement.
 
-`npm run dev` reconstruit le web puis lance le compagnon Rust ; après modification
-du frontend, relancer le build et recharger le navigateur. Après build, le binaire Rust peut être exécuté directement sans Node :
+`npm run dev` lance le compagnon Rust en mode développement. Il surveille les
+sources Expo, relance leur export après chaque modification et actualise
+automatiquement la page ouverte sur `http://127.0.0.1:4317`. Il s’agit d’un
+rechargement complet de la page : les chemins mémorisés localement sont rouverts,
+mais l’état provisoire de l’interface est réinitialisé. Aucun serveur Node
+n’est lancé ; Expo est appelé uniquement pour exporter le frontend. Les exports
+de développement sont placés dans `.local-logs-dev/`, ignoré par Git.
+Si un export échoue, le dernier build réussi reste servi ; corriger la source
+déclenche un nouvel essai. Les changements du code Rust demandent de relancer
+`npm run dev`.
+
+`npm run preview` conserve l’ancien parcours : un export puis le compagnon,
+sans surveillance. Avec `npm start`, exécuter d’abord `npm run build`. Pour ces
+deux commandes statiques, une modification du frontend demande un nouvel export,
+un redémarrage du compagnon et une actualisation du navigateur. Après build,
+le binaire Rust peut être exécuté directement sans Node :
 `../local-logs-server/target/release/local-logs-server --dist ./dist`. Un port occupé est signalé ; choisir par exemple
 `LOCAL_LOGS_PORT=4320 npm start`. Arrêt par Ctrl+C : connexions et ressources fermées.
 
@@ -69,8 +90,12 @@ Pour la fixture gérée, choisir **Journaux RLOGGER** puis ouvrir le sous-dossie
   replient/déplient un dossier. Le séparateur se règle au pointeur ou au clavier.
 - Chaque parcours mémorise son dernier chemin ; le choix du parcours et la largeur
   sont également enregistrés dans le navigateur, jamais le contenu. Changer de
-  parcours ferme la racine affichée ; cliquer sur **Ouvrir** pour revalider le
-  chemin mémorisé. Les préférences peuvent être réinitialisées.
+  parcours ferme la racine affichée puis ouvre automatiquement le chemin mémorisé
+  pour la nouvelle entrée. Le parcours sélectionné s’ouvre aussi au démarrage.
+  L’ancien chemin générique est replacé dans l’entrée appropriée lors de la
+  première ouverture après mise à jour. Aucun chemin vers des journaux tiers
+  n’est préconfiguré dans le dépôt : chacun le saisit sur sa machine. Les
+  préférences peuvent être réinitialisées.
 
 La disparition d’un fichier est signalée et le chemin reste observé. Troncature ou
 remplacement détecté : nouveau snapshot, sans fusion des générations. Après coupure

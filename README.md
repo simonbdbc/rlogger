@@ -49,6 +49,11 @@ The demo prints its
 log root and shutdown report. Stop the reader with Ctrl+C; the library and log
 files remain independent.
 
+For frontend development, run `npm run dev` from `front-react-logger/`. The Rust
+companion watches Expo sources, reruns the web export on changes and reloads the
+browser page automatically. This is a full page reload; no Node server is used.
+`npm run preview` keeps the one-off build and static reader workflow.
+
 For an async producer example, run:
 
 ```sh
@@ -67,7 +72,9 @@ from the tree but included in parent sizes and recursive actions. RLOGGER's
 automatic recovery and empty-day cleanup require an eligible private RLOGGER
 root and the RLOGGER mode. External mode disables automatic maintenance in the
 Rust companion even when pointed at a valid RLOGGER root. Each mode remembers
-its own last directory. See the [current action contract](docs/11-actions-fichiers-dossiers.md)
+and automatically opens its own last directory when selected or restored at
+startup. External log paths are entered locally and are not bundled with the
+repository. See the [current action contract](docs/11-actions-fichiers-dossiers.md)
 and [compatibility notes](docs/COMPATIBILITE.md).
 
 ## Develop and verify

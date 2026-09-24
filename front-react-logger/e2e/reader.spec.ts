@@ -25,7 +25,7 @@ test.beforeEach(async ({ page }) => {
   await writeFile(path.join(dir, "empty.log"), "");
   await page.goto(service.origin);
   await expect(
-    page.getByRole("heading", { name: "Local Logs", exact: true }),
+    page.getByRole("heading", { name: "Journaux RLOGGER", exact: true }),
   ).toBeVisible();
 });
 test.afterEach(async ({ page }) => {
@@ -89,10 +89,66 @@ test("source menu keeps separate paths and omits maintenance warning for externa
   await expect(
     page.getByRole("textbox", { name: "Dossier local" }),
   ).toHaveValue(dir);
+  await expect(
+    page.getByRole("treeitem", { name: "a.log", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Maintenance automatique RLOGGER indisponible.", {
+      exact: false,
+    }),
+  ).toBeVisible();
   await external.click();
   await expect(
     page.getByRole("textbox", { name: "Dossier local" }),
   ).toHaveValue(dir);
+  await expect(
+    page.getByRole("treeitem", { name: "a.log", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Maintenance automatique RLOGGER indisponible.", {
+      exact: false,
+    }),
+  ).toHaveCount(0);
+});
+test("moves a previously external RLOGGER root to its menu and opens saved folders", async ({
+  page,
+}) => {
+  await promisify(execFile)(
+    path.resolve("../local-logs-server/target/debug/examples/fixtures"),
+    [dir, "--managed"],
+  );
+  const root = path.join(dir, "rlogger");
+  await page.evaluate(
+    ({ managedPath, externalPath }) => {
+      localStorage.setItem("local-logs-path-external", managedPath);
+      localStorage.removeItem("local-logs-path-rlogger");
+      localStorage.setItem("local-logs-path", externalPath);
+      localStorage.setItem("local-logs-mode", "external");
+      localStorage.removeItem("local-logs-source-migration-v2");
+    },
+    { managedPath: root, externalPath: dir },
+  );
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: /Journaux RLOGGER/ }),
+  ).toHaveAttribute("aria-current", "page");
+  await expect(
+    page.getByRole("textbox", { name: "Dossier local" }),
+  ).toHaveValue(root);
+  await expect(
+    page.getByRole("treeitem", { name: "1970-01-01", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: /Journaux externes/ }).click();
+  await expect(
+    page.getByRole("textbox", { name: "Dossier local" }),
+  ).toHaveValue(dir);
+  await expect(
+    page.getByRole("treeitem", { name: "a.log", exact: true }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByRole("treeitem", { name: "a.log", exact: true }),
+  ).toBeVisible();
 });
 test("path, empty state, real append, error and raw HTML remain distinct", async ({
   page,
