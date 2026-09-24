@@ -1,5 +1,10 @@
 # Changelog du lecteur et compagnon
 
+## Lecteur 0.5.1 / compagnon 0.3.1 — 24 septembre 2026
+
+- Arbre et pagination triés par nom décroissant dans chaque dossier, pour les fichiers et les dossiers ; le contenu des journaux conserve son ordre de lecture.
+- Test navigateur sur l’ordre affiché et test Rust sur les limites entre pages.
+
 ## Lecteur 0.5.0 — 24 septembre 2026
 
 - Deux écrans Expo web copiables, `RloggerLogsScreen` et `ExternalLogsScreen`, regroupés avec leurs dépendances dans `src/log-viewer/`.

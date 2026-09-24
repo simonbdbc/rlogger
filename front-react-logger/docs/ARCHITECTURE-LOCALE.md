@@ -1,6 +1,6 @@
 # Architecture locale et contrat de lecture v1
 
-Lecteur 0.5.0, compagnon Rust 0.3.0, logger 0.2.0 ; protocole v1 étendu pour
+Lecteur 0.5.1, compagnon Rust 0.3.1, logger 0.2.0 ; protocole v1 étendu pour
 la gestion horaire.
 [Guide de lancement](../README.md), [types partagés](../src/log-viewer/protocol.ts),
 [intégration Expo web](INTEGRATION-EXPO.md).
@@ -110,7 +110,7 @@ entre deux observations restent hors garantie append-only.
 
 Ces plafonds ne sont pas un plafond RSS global. Les bibliothèques, le navigateur,
 l’allocateur et les métadonnées ont leur propre coût.
-L’arbre est paginé et trié de façon stable ; la première observation invalide le snapshot
+L’arbre est paginé par noms décroissants ; la première observation invalide le snapshot
 initial pour couvrir les créations survenues avant installation de l’observation.
 Les inventaires récursifs de tailles/maintenance sont mutualisés par racine ouverte,
 bornés à 200 000 entrées au total et relancés au plus une fois toutes les 60
@@ -146,7 +146,7 @@ Le format RLOG/1 est du texte ordinaire pour ce lecteur.
 
 ## Gestion horaire — extension 0.3.0
 
-Le lecteur 0.5.0 utilise le compagnon 0.3.0 pour ces DTO additionnels ; HTTP/WS
+Le lecteur 0.5.1 utilise le compagnon 0.3.1 pour ces DTO additionnels ; HTTP/WS
 et les tranches existantes conservent la version 1. Le logger reste indépendant.
 
 | Opération | Route | Contrat |

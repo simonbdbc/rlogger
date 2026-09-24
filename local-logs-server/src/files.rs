@@ -311,7 +311,9 @@ impl FileRoot {
                 .ok()
                 .and_then(|bytes| serde_json::from_slice::<Cursor>(&bytes).ok());
             match parsed {
-                Some(c) if c.root == self.id && c.parent == parent_id && c.rev == rev => c.after,
+                Some(c) if c.root == self.id && c.parent == parent_id && c.rev == rev => {
+                    Some(c.after)
+                }
                 _ => {
                     return Err(Error::new(
                         "CURSOR_INVALID",
@@ -321,7 +323,7 @@ impl FileRoot {
                 }
             }
         } else {
-            String::new()
+            None
         };
         let mut selected = BTreeMap::new();
         for (seen, entry) in self.root.read_directory(&relative)?.enumerate() {
@@ -335,7 +337,11 @@ impl FileRoot {
             let Ok(name) = entry?.into_string() else {
                 continue;
             };
-            if name.starts_with('.') || name <= after {
+            if name.starts_with('.')
+                || after
+                    .as_ref()
+                    .is_some_and(|last| name.as_str() >= last.as_str())
+            {
                 continue;
             }
             let child = relative.join(&name);
@@ -352,12 +358,12 @@ impl FileRoot {
             };
             selected.insert(name, kind);
             if selected.len() > PAGE + 1 {
-                selected.pop_last();
+                selected.pop_first();
             }
         }
         let has_next = selected.len() > PAGE;
         let mut entries = Vec::with_capacity(PAGE);
-        for (name, kind) in selected.into_iter().take(PAGE) {
+        for (name, kind) in selected.into_iter().rev().take(PAGE) {
             let child = relative.join(&name);
             if child.as_os_str().len() > 4096 {
                 continue;

@@ -167,8 +167,12 @@ fn pagination_and_changed_cursor() {
     let id = root.node_id.clone();
     let first = root.entries(&id, None).unwrap();
     assert_eq!(first.entries.len(), 500);
+    assert_eq!(first.entries.first().unwrap().name, "0509.txt");
+    assert_eq!(first.entries.last().unwrap().name, "0010.txt");
     let last = root.entries(&id, first.cursor.as_deref()).unwrap();
     assert_eq!(last.entries.len(), 10);
+    assert_eq!(last.entries.first().unwrap().name, "0009.txt");
+    assert_eq!(last.entries.last().unwrap().name, "0000.txt");
     assert_eq!(root.cached_nodes(), 511);
     fs::write(temp.path().join("new.log"), "").unwrap();
     assert_eq!(

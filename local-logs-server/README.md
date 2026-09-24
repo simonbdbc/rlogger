@@ -1,4 +1,4 @@
-# Compagnon local Rust — 0.3.0
+# Compagnon local Rust — 0.3.1
 
 Binaire autonome Rust 1.95+, Axum/Tokio. Il sert le build Expo et lit les fichiers
 sur la même machine. En mode statique, aucun runtime Node ni Python n’est
@@ -25,6 +25,7 @@ Voir le [contrat des actions](../docs/11-actions-fichiers-dossiers.md).
 Les listes de l’arbre masquent tous les fichiers et dossiers dont le nom commence
 par un point, notamment `.rlogger`, à chaque profondeur. Ce filtre d’affichage
 n’exclut pas leur contenu des tailles ni des opérations récursives sur leur parent.
+Les entrées visibles sont paginées et classées par nom décroissant dans chaque dossier.
 Voir le [contrat horaire](../docs/09-migration-arborescence-rlogger.md) et
 les [routes de gestion](../front-react-logger/docs/ARCHITECTURE-LOCALE.md#gestion-horaire--extension-030).
 

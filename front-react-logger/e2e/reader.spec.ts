@@ -43,6 +43,14 @@ async function open(page: Page, directory = dir) {
     page.getByRole("treeitem", { name: "a.log", exact: true }),
   ).toBeVisible();
 }
+test("files are displayed in descending lexical order", async ({ page }) => {
+  await writeFile(path.join(dir, "c.log"), "C\n");
+  await open(page);
+  const names = await page
+    .getByRole("treeitem")
+    .evaluateAll((rows) => rows.map((row) => row.getAttribute("aria-label")));
+  expect(names).toEqual(["empty.log", "c.log", "b.txt", "a.log"]);
+});
 const selectedAction = (page: Page, action: string) =>
   page
     .getByRole("treeitem", { selected: true })

@@ -1,4 +1,4 @@
-# Local Logs — lecteur 0.5.0
+# Local Logs — lecteur 0.5.1
 
 Lecteur local Expo web, gluestack et compagnon Rust. Aucun compte ni backend
 métier : un chemin absolu, un arbre, le fichier sélectionné et ses ajouts en direct.
@@ -79,8 +79,9 @@ Pour la fixture gérée, choisir **Journaux RLOGGER** puis ouvrir le sous-dossie
 - Déplier les dossiers et cliquer sur un fichier. Les fichiers et dossiers cachés
   (nom commençant par un point, dont `.rlogger`) ne sont jamais affichés dans l’arbre.
   Ils restent inclus dans les tailles, archives et suppressions de leur dossier parent.
-  Structure générique,
-  sans hypothèse de date/profondeur métier. Arbre et lecteur défilent séparément.
+  Les noms sont affichés en ordre décroissant dans chaque dossier. L’arbre reste
+  générique, sans hypothèse de date ou de profondeur. Arbre et lecteur défilent
+  séparément.
 - Le fichier s’ouvre sur les derniers 256 Kio ; **Charger plus ancien** relit des
   pages contiguës. Les positions affichées sont des octets, pas des lignes.
 - Le défilement suit les ajouts seulement si vous étiez en bas. En remontant,

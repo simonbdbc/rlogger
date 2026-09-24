@@ -1,6 +1,6 @@
 # Spécification fonctionnelle du lecteur local
 
-Lecteur 0.5.0 : socle initial conservé. L’extension du protocole 0.3.0 est
+Lecteur 0.5.1 : socle initial conservé. L’extension du protocole 0.3.0 est
 décrite dans
 l’[architecture livrée](ARCHITECTURE-LOCALE.md#gestion-horaire--extension-030),
 le [guide](../README.md) et le [contrat actuel des actions](../../docs/11-actions-fichiers-dossiers.md).
@@ -67,8 +67,8 @@ revalidé à son ouverture.
   leur contenu au démarrage. Les entrées cachées restent prises en compte dans
   les tailles et les actions récursives sur leur parent.
 
-Tri livré : dossiers d’abord puis noms dans un ordre lexical stable, sans interpréter
-les dates ou le métier. L’arbre ne doit
+Tri livré : noms décroissants dans chaque dossier, sans interpréter les dates,
+le métier ou le type d’entrée. L’arbre ne doit
 pas se réordonner à chaque append sur la seule base du mtime. Ce tri de navigation
 n’a aucun effet sur l’ordre des lignes lues.
 
@@ -113,7 +113,7 @@ au retour en bas. Ne pas accumuler une file illimitée dans le navigateur.
 
 Option différée à FRONT-028. Les paragraphes suivants
 décrivent son cadrage futur ; aucun réglage de suivi du successeur n’est livré
-dans le lecteur 0.5.0.
+dans le lecteur 0.5.1.
 
 Si activée, suivre une destination précise dans un run et une instance connus.
 Une rotation `http-08.log` → `http-09.log` peut faire changer la sélection et ouvrir
