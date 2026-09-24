@@ -1,6 +1,6 @@
 # Documentation du lecteur local
 
-Lecteur 0.4.0 / compagnon 0.3.0 : consultation générique, actions explicites
+Lecteur 0.5.0 / compagnon 0.3.0 : consultation générique, actions explicites
 sur les fichiers et dossiers, et maintenance du stockage horaire privé.
 [Guide utilisateur](../README.md), [contrat actuel des actions](../../docs/11-actions-fichiers-dossiers.md).
 
@@ -21,6 +21,7 @@ et empêcher l’accès direct au compagnon depuis des clients non fiables.
 | --- | --- |
 | [Spécification](SPECIFICATION.md) | Parcours, disposition, états, suivi et limites |
 | [Architecture locale](ARCHITECTURE-LOCALE.md) | Compagnon, API, positions de lecture et ressources |
+| [Intégration Expo web](INTEGRATION-EXPO.md) | Copie des deux écrans, routes, menu hôte et origine locale |
 | [Documentation du projet](../../docs/README.md) | Bibliothèque, stockage et contrat des actions |
 
 ## Périmètre et statut
@@ -36,9 +37,11 @@ d’un journal JSON ou d’une interface structurée avancée.
 
 ## Organisation livrée
 
-- `app/` : routes Expo Router et cycle de vie React.
-- `src/` : arbre, lecteur virtualisé, gluestack, préférences, client HTTP/WS.
-- `shared/` : protocole et fenêtre d’octets.
+- `app/` : route du lecteur autonome.
+- `src/log-viewer/` : deux écrans copiables, arbre, lecteur virtualisé, gluestack,
+  préférences, client HTTP/WS, protocole et fenêtre d’octets.
+- `src/workspace.tsx`, `src/standalone.css` : menu et mise en page propres au lecteur autonome.
+- `shared/` : tests unitaires du protocole et des tailles.
 - `../local-logs-server/` : compagnon Rust, confinement, lecture et tests.
 - `e2e/` : scénarios WebKit desktop et petite largeur.
 - `../local-logs-server/examples/fixtures.rs` : génération Rust des fichiers synthétiques de démonstration.

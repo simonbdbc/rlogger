@@ -1,4 +1,4 @@
-import type { FileSize } from "../shared/protocol";
+import type { FileSize } from "./protocol";
 export function formatBytes(value: string | null | undefined) {
   if (value == null) return "indisponible";
   const n = BigInt(value);

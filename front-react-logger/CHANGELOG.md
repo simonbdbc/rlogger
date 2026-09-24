@@ -1,5 +1,19 @@
 # Changelog du lecteur et compagnon
 
+## Lecteur 0.5.0 — 24 septembre 2026
+
+- Deux écrans Expo web copiables, `RloggerLogsScreen` et `ExternalLogsScreen`, regroupés avec leurs dépendances dans `src/log-viewer/`.
+- Le lecteur autonome utilise ces mêmes écrans ; son menu et ses styles globaux restent séparés du module copiable.
+- Styles du module limités à `.rlogger-viewer`, préférences de dossier propres à chaque source et session du compagnon fermée à la sortie de l’écran.
+- [Guide d’intégration Expo](docs/INTEGRATION-EXPO.md) : copie du module, routes, liens dans un menu existant et build servi par le compagnon Rust sur la même origine.
+- Vérifications locales : types, formatage, export Expo, six tests unitaires, 28 scénarios WebKit du lecteur autonome et un parcours WebKit dans une application hôte temporaire.
+
+## Lecteur 0.4.0 — 23 septembre 2026
+
+- Menu séparant les journaux RLOGGER privés et les journaux externes ; chaque entrée mémorise et rouvre son dossier.
+- Maintenance automatique demandée uniquement pour le parcours RLOGGER, sans avertissement de maintenance pour les dossiers externes.
+- `npm run dev` relance l’export Expo après modification et recharge la page via le compagnon Rust, sans serveur Node.
+
 ## Évolution locale — 23 septembre 2026
 
 - Téléchargement et suppression manuelle de tous les fichiers réguliers, sans restriction de format ou d’heure.

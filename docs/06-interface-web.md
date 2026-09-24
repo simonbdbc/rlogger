@@ -12,13 +12,16 @@ affiche son contenu à droite et les ajouts sont affichés en temps réel. Aucun
 compte, mot de passe, URL de serveur distant, cloud ou application mobile n’est
 nécessaire dans cette version.
 
-La spécification décrit le lecteur sans dépendre d’une application externe. Les
-interactions attendues sont couvertes par les tests et captures de RLOGGER.
+Le lecteur complet reste autonome. Ses deux écrans peuvent aussi être copiés
+dans une application Expo web locale et liés à son menu existant ; voir le
+[guide d’intégration](../front-react-logger/docs/INTEGRATION-EXPO.md).
+Les interactions du lecteur autonome sont couvertes par les tests navigateur.
 
 ## Parcours principal
 
 1. Lancer le lecteur local.
-2. Saisir un chemin absolu, puis cliquer sur « Ouvrir le dossier ».
+2. Choisir « Journaux RLOGGER » ou « Journaux externes », saisir un chemin absolu,
+   puis cliquer sur « Ouvrir ».
 3. Déplier librement les niveaux de l’arborescence.
 4. Cliquer sur un fichier régulier visible, quelle que soit son extension, pour en
    lire le contenu.
@@ -31,10 +34,11 @@ fin des gros fichiers et le suivi conditionnel du scroll sont implémentés.
 Le contenu plus ancien doit rester accessible, sans chargement complet en mémoire.
 
 ```text
-Dossier des logs : [/chemin/vers/logs                        ] [Ouvrir]
+Sources : [Journaux RLOGGER] [Journaux externes]
+Dossier local : [/chemin/vers/logs                           ] [Ouvrir]
 ┌────────────────────────┬────────────────────────────────────────────┐
 │ Dossiers et fichiers   │ rlogger/2026-09-08/backend/http-09-<id>.log│
-│ [Actualiser]           │ ● En direct   [Aller en bas]              │
+│ [Actualiser]           │ ● En direct   [Retour en bas]             │
 │ ▾ rlogger              ├────────────────────────────────────────────┤
 │   ▾ 2026-09-08         │ 09:00:00 INFO [LATENCY — 2ms] Début…       │
 │     ▾ backend           │ 09:00:01 INFO [LATENCY — 3ms] Fin…         │
@@ -67,8 +71,10 @@ Le compagnon appartient au chantier frontend, pas au cœur Rust. Rust, Axum et
 Tokio sont les choix livrés, avec HTTP/WS v1. Il écoute uniquement sur loopback.
 Il permet le téléchargement et la suppression explicite des fichiers réguliers
 et dossiers de toute racine ouverte, selon les permissions du système. La
-récupération et le nettoyage automatiques exigent une racine RLOGGER 2 privée ;
-une racine non privée reste consultable et affiche la raison du refus de maintenance.
+récupération et le nettoyage automatiques exigent le parcours RLOGGER et une
+racine RLOGGER 2 privée ; une racine non privée reste consultable et affiche la
+raison du refus dans ce parcours. Le parcours externe n’active pas la maintenance
+et n’affiche pas d’avertissement à ce sujet.
 Il ne réécrit pas le contenu des logs. L’application sert localement ses assets
 du build ; aucune ressource distante n’est requise pour lire les logs.
 
@@ -122,6 +128,7 @@ garantie en cas de suspension du navigateur, de disque bloqué ou de très forte
 
 - [Documentation frontend](../front-react-logger/docs/README.md)
 - [Architecture et protocole local](../front-react-logger/docs/ARCHITECTURE-LOCALE.md)
+- [Intégration des écrans dans une application Expo web](../front-react-logger/docs/INTEGRATION-EXPO.md)
 
 La lecture brute se teste avec les fichiers synthétiques créés par
 l’[exemple Rust du compagnon](../local-logs-server/examples/fixtures.rs).

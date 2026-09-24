@@ -54,6 +54,13 @@ companion watches Expo sources, reruns the web export on changes and reloads the
 browser page automatically. This is a full page reload; no Node server is used.
 `npm run preview` keeps the one-off build and static reader workflow.
 
+The complete reader remains available as a standalone app. For an existing
+local Expo web app, the [integration guide](front-react-logger/docs/INTEGRATION-EXPO.md)
+shows how to copy the two ready-made log screens, add links to its menu, and
+serve that app's export through the same-origin Rust companion. The copyable
+frontend module is `front-react-logger/src/log-viewer/`; no npm package is
+published for it.
+
 For an async producer example, run:
 
 ```sh

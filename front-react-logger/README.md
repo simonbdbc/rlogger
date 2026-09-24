@@ -1,7 +1,13 @@
-# Local Logs — lecteur 0.4.0
+# Local Logs — lecteur 0.5.0
 
 Lecteur local Expo web, gluestack et compagnon Rust. Aucun compte ni backend
 métier : un chemin absolu, un arbre, le fichier sélectionné et ses ajouts en direct.
+
+Le frontend complet peut être repris tel quel. Pour ajouter seulement les deux
+écrans préconstruits à une application Expo web locale et relier **Journaux
+RLOGGER** / **Journaux externes** à son menu existant, suivre le
+[guide d’intégration](docs/INTEGRATION-EXPO.md). Les composants à copier se
+trouvent dans `src/log-viewer/` ; le menu autonome reste dans `src/workspace.tsx`.
 
 ## Démarrage
 

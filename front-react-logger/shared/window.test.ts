@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { ByteWindow } from "./window.ts";
-import type { Chunk } from "./protocol.ts";
+import { ByteWindow } from "../src/log-viewer/window.ts";
+import type { Chunk } from "../src/log-viewer/protocol.ts";
 function chunk(data: Buffer, start: number): Chunk {
   return {
     generation: "one",

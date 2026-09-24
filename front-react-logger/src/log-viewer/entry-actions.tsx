@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { Entry } from "../shared/protocol";
+import type { Entry } from "./protocol";
 import type { ViewerStore } from "./viewer-store";
 import { Action } from "./ui";
 

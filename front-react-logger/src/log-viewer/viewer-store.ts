@@ -1,5 +1,5 @@
 import { Api, ApiError } from "./api";
-import { ByteWindow } from "../shared/window";
+import { ByteWindow } from "./window";
 import {
   LIMITS,
   type Root,
@@ -9,7 +9,7 @@ import {
   type ServerMessage,
   type ClientMessage,
   type Inventory,
-} from "../shared/protocol";
+} from "./protocol";
 export interface ViewState {
   inventory: Inventory | null;
   actionBusy: boolean;
@@ -318,9 +318,6 @@ export class ViewerStore {
         evicted: false,
         status: "Choisissez un fichier",
       });
-      try {
-        localStorage.setItem(`local-logs-path-${mode}`, root.absolutePath);
-      } catch {}
       await this.loadBranch(root.nodeId);
       void this.statistics(true);
       this.observeBranches();
@@ -663,6 +660,7 @@ export class ViewerStore {
     if (this.state.selected) await this.select(this.state.selected);
   }
   stop() {
+    if (this.stopped) return;
     if (this.inventoryTimer) clearTimeout(this.inventoryTimer);
     this.stopped = true;
     this.revision++;
@@ -671,5 +669,11 @@ export class ViewerStore {
     clearInterval(this.heartbeat);
     this.socket?.close();
     void this.api.close();
+    // An in-flight open may have created a root after the first close request.
+    if (this.opening || this.closing) {
+      void Promise.allSettled([this.opening, this.closing]).then(() =>
+        this.api.close(),
+      );
+    }
   }
 }

@@ -1,6 +1,6 @@
 # Spécification fonctionnelle du lecteur local
 
-Lecteur 0.4.0 : socle initial conservé. L’extension du protocole 0.3.0 est
+Lecteur 0.5.0 : socle initial conservé. L’extension du protocole 0.3.0 est
 décrite dans
 l’[architecture livrée](ARCHITECTURE-LOCALE.md#gestion-horaire--extension-030),
 le [guide](../README.md) et le [contrat actuel des actions](../../docs/11-actions-fichiers-dossiers.md).
@@ -19,7 +19,7 @@ une racine RLOGGER 2 privée. Une racine non privée reste consultable, avec rai
 visible de la désactivation dans le parcours RLOGGER. Le parcours externe ne
 demande jamais cette maintenance et ne montre pas cet avertissement. Les deux
 parcours ont des chemins mémorisés distincts ; sélectionner une entrée ferme la
-racine précédente puis ouvre automatiquement son dossier configuré.
+session précédente, puis ouvre automatiquement son dossier configuré.
 Les rafraîchissements manuels de l’inventaire sont
 limités à un nouveau scan par racine toutes les 60 secondes.
 
@@ -38,8 +38,8 @@ vers un service tiers n’est inclus.
 
 ### Barre du dossier
 
-- Champ « Dossier des logs » acceptant un chemin absolu.
-- Action « Ouvrir le dossier », déclenchable avec Entrée.
+- Champ « Dossier local » acceptant un chemin absolu.
+- Action « Ouvrir », déclenchable avec Entrée.
 - Chemin actif visible ; le texte en cours de saisie reste distinct du chemin actif.
 - Erreur explicite : absent, non lisible, fichier fourni à la place d’un dossier,
   chemin non absolu ou service local indisponible.
@@ -112,7 +112,8 @@ au retour en bas. Ne pas accumuler une file illimitée dans le navigateur.
 ### Suivi du fichier successeur
 
 Option différée à FRONT-028. Les paragraphes suivants
-décrivent son cadrage futur ; aucun toggle de successeur n’est livré en 0.1.0.
+décrivent son cadrage futur ; aucun réglage de suivi du successeur n’est livré
+dans le lecteur 0.5.0.
 
 Si activée, suivre une destination précise dans un run et une instance connus.
 Une rotation `http-08.log` → `http-09.log` peut faire changer la sélection et ouvrir

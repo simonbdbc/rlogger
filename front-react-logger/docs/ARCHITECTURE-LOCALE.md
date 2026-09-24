@@ -1,8 +1,9 @@
 # Architecture locale et contrat de lecture v1
 
-Lecteur 0.4.0, compagnon Rust 0.3.0, logger 0.2.0 ; protocole v1 étendu pour
+Lecteur 0.5.0, compagnon Rust 0.3.0, logger 0.2.0 ; protocole v1 étendu pour
 la gestion horaire.
-[Guide de lancement](../README.md), [types partagés](../shared/protocol.ts).
+[Guide de lancement](../README.md), [types partagés](../src/log-viewer/protocol.ts),
+[intégration Expo web](INTEGRATION-EXPO.md).
 
 ## Responsabilités et lancement
 
@@ -44,14 +45,15 @@ un chemin arbitraire n’est accepté qu’à l’ouverture de racine. JSON d’
 `code` et `message`, avec statut HTTP. NOT_FOUND, PERMISSION, ROOT_CHANGED,
 GENERATION_CHANGED, CURSOR_INVALID, FORBIDDEN, LIMIT et SESSION_EXPIRED sont distincts.
 
-Le menu **Journaux RLOGGER** envoie `maintenance: true`, le menu **Journaux
+L’écran **Journaux RLOGGER** envoie `maintenance: true`, l’écran **Journaux
 externes** envoie `maintenance: false`. L’absence du champ conserve le comportement
 historique (`true`). La maintenance automatique exige à la fois ce choix et la
 validation de la racine privée RLOGGER v2. Les inventaires restent disponibles
 dans les deux parcours ; les tâches d’inventaire sont distinctes selon ce choix,
 afin qu’une consultation externe ne déclenche aucune récupération ni nettoyage.
-Le changement de parcours ferme la racine courante via `DELETE`, puis ouvre
-automatiquement le chemin mémorisé pour ce parcours. Au démarrage, le parcours
+Le changement de parcours ferme la session courante et sa racine via
+`DELETE /api/v1/session`, puis ouvre automatiquement le chemin mémorisé pour ce
+parcours. Au démarrage, le parcours
 sélectionné ouvre aussi son chemin mémorisé. Chaque ouverture revalide la racine
 côté Rust ; un chemin absent ou non autorisé reste affiché avec son erreur.
 Les chemins sont des préférences du navigateur local ; aucun chemin d’application
@@ -144,7 +146,7 @@ Le format RLOG/1 est du texte ordinaire pour ce lecteur.
 
 ## Gestion horaire — extension 0.3.0
 
-Le lecteur 0.4.0 utilise le compagnon 0.3.0 pour ces DTO additionnels ; HTTP/WS
+Le lecteur 0.5.0 utilise le compagnon 0.3.0 pour ces DTO additionnels ; HTTP/WS
 et les tranches existantes conservent la version 1. Le logger reste indépendant.
 
 | Opération | Route | Contrat |

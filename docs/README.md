@@ -27,6 +27,7 @@ l’accès direct au compagnon depuis des clients non fiables.
 | [Actions sur fichiers et dossiers](11-actions-fichiers-dossiers.md) | Téléchargement et suppression |
 | [Compatibilité](COMPATIBILITE.md) | Versions et limites connues |
 | [Lecteur local](../front-react-logger/docs/README.md) | Spécification et protocole |
+| [Intégration Expo web](../front-react-logger/docs/INTEGRATION-EXPO.md) | Écrans copiables et liens dans un menu existant |
 
 ## Organisation
 
