@@ -199,10 +199,10 @@ function LogsScreenContent({
         >
           <span>Ⅱ</span>
         </div>
-        <Reader store={store} state={state} />
+        <Reader key={mode} store={store} state={state} mode={mode} />
       </div>
       <footer className="footer">
-        <span>Texte brut · Fichiers locaux</span>
+        <span>Fichiers locaux · Présentation réversible</span>
         <button className="reset-preferences" onClick={reset}>
           Réinitialiser les préférences
         </button>

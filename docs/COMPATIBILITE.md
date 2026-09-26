@@ -1,4 +1,4 @@
-# Compatibilité — logger 0.2.0 / compagnon 0.3.1 / lecteur 0.5.1
+# Compatibilité — logger 0.2.0 / compagnon 0.3.2 / lecteur 0.5.2
 
 > Extension locale du 23 septembre : les actions manuelles couvrent désormais tous
 > les fichiers réguliers et dossiers dans la racine ouverte, avec téléchargement TAR
@@ -16,7 +16,7 @@ décrit les opérations manuelles actuelles.
 | Rust / MSRV | rustc/cargo 1.95.0, édition 2024 ; features optionnelles `log` et `tracing` |
 | Stockage | Marqueur RLOGGER storage 2, rotation horaire obligatoire, segments actifs/finalisés/récupérés |
 | Texte | RLOG/1 inchangé, UTF-8 avec contrôles échappés |
-| Compagnon / frontend | local-logs-server 0.3.1, local-logs-viewer 0.5.1 |
+| Compagnon / frontend | local-logs-server 0.3.2, local-logs-viewer 0.5.2 |
 | Protocole | HTTP /api/v1, WS local-logs.v1 ; extension additive des DTO et routes de gestion |
 | Backend | Rust, Axum 0.8.9 et Tokio ; versions exactes verrouillées dans Cargo.lock |
 | Outillage frontend | Node 24.18.0, npm 11.16.0 ; aucun serveur Node |
@@ -35,9 +35,10 @@ Un finalisé n’est plus rouvert ; une capture tardive crée un nouveau segment
 Aucun déplacement d’anciens logs. Racines génériques et formats historiques :
 lecture, tailles et actions manuelles selon les permissions du système. La
 maintenance automatique exige d’ouvrir exactement la racine RLOGGER 2 privée.
-Le frontend 0.5.1 utilise le compagnon 0.3.1 pour obtenir les entrées par nom
-décroissant. Le compagnon 0.3.0 conserve les mêmes métadonnées mais renvoie les
-entrées par nom croissant ; les anciennes routes de lecture restent disponibles.
+Le frontend 0.5.2 utilise l’ordre décroissant fourni depuis le compagnon 0.3.1.
+Le compagnon 0.3.2 ajoute le journal JSON synthétique au générateur d’exemples.
+Le compagnon 0.3.0 conserve les mêmes métadonnées mais renvoie les entrées par
+nom croissant ; les anciennes routes de lecture restent disponibles.
 Ses deux écrans peuvent aussi être copiés dans une application Expo Router web
 locale, à condition de servir son build par le même compagnon et sur la même
 origine. Cette intégration n’étend pas la compatibilité à iOS ou Android.

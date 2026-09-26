@@ -1,4 +1,4 @@
-# Local Logs — lecteur 0.5.1
+# Local Logs — lecteur 0.5.2
 
 Lecteur local Expo web, gluestack et compagnon Rust. Aucun compte ni backend
 métier : un chemin absolu, un arbre, le fichier sélectionné et ses ajouts en direct.
@@ -72,7 +72,8 @@ explicitement régénéré avec `--large`. Un dossier fourni doit déjà exister
 appartenir au compte courant, être privé et ne contenir aucun lien symbolique.
 
 Pour la fixture gérée, choisir **Journaux RLOGGER** puis ouvrir le sous-dossier
-`rlogger` du chemin affiché.
+`rlogger` du chemin affiché. Le fichier `rlog-json-example.log` y montre le
+rendu lisible d’événements RLOG/1.
 
 ## Lire
 
@@ -87,8 +88,19 @@ Pour la fixture gérée, choisir **Journaux RLOGGER** puis ouvrir le sous-dossie
 - Le défilement suit les ajouts seulement si vous étiez en bas. En remontant,
   la vue reste stable et signale les nouveaux octets. **Retour en bas** recharge
   la fin actuelle. Le nombre de nouvelles lignes n’est pas inventé.
-- Le texte conserve l’ordre disque, Unicode, CRLF, dernière ligne incomplète,
-  `xN` et `LATENCY`. Des contrôles de connexion ne sont jamais injectés dans le texte.
+- En mode brut, le texte conserve l’ordre disque, Unicode, CRLF, dernière ligne
+  incomplète, `xN` et `LATENCY`. Des contrôles de connexion ne sont jamais
+  injectés dans le texte.
+- **Journaux RLOGGER** présente par défaut les lignes RLOG/1 complètes dont le
+  message décodé est du JSON valide : horodatage, niveau, `action`, `seq` et
+  `LATENCY` en en-tête, puis JSON indenté. **Voir le texte brut** restitue
+  immédiatement le texte conservé par le lecteur ; **Afficher le JSON lisible**
+  réactive la présentation, sans nouvelle lecture ni connexion. Les lignes
+  ordinaires, partielles, mal formées ou contenant un JSON incomplet restent
+  brutes. **Journaux externes** reste toujours en texte brut, même pour RLOG/1.
+  Cette présentation ne modifie aucun fichier.
+  Un [fichier de test RLOG/1](e2e/rlog-json-example.log) contient deux événements
+  JSON concrets et sert aussi au test navigateur de ces deux modes.
 - La fenêtre conserve au plus 1 Mio / 20 000 lignes. Le rendu est virtualisé :
   sélection/copie du texte rendu, pas du fichier entier non chargé. Une seule ligne
   géante reste bornée ; scroll horizontal. UTF-8 invalide signalé et remplacé par �,
@@ -174,8 +186,10 @@ détectent de nombreuses mutations ; une réécriture arbitraire de même taille
 les mêmes frontières entre observations n’est pas garantie détectée. L’arbre découvre
 les fichiers nouveaux mais la sélection ne suit pas automatiquement un successeur.
 
-FRONT-028/029/030 différés : suivi du successeur, parsing structuré, recherche dans le
-fichier entier. Aucun panneau de métriques internes du logger n’est fabriqué depuis ses logs.
+FRONT-028/029/030 restent différés : suivi du successeur, parsing structuré
+complet et recherche dans le fichier entier. La présentation JSON par ligne
+ne fusionne pas les événements multiparties et ne clôt pas FRONT-029. Aucun
+panneau de métriques internes du logger n’est fabriqué depuis ses logs.
 
 ## Vérifier
 

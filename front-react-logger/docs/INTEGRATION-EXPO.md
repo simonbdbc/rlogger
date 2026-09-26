@@ -4,7 +4,8 @@ Le lecteur complet peut rester une application autonome. Pour afficher les même
 logs dans une application Expo Router existante, copier uniquement
 `front-react-logger/src/log-viewer/` dans `src/log-viewer/` de l’application hôte.
 Ce dossier contient les deux écrans, leurs composants, le client HTTP/WebSocket,
-le protocole, les préférences et la feuille de style isolée. Son point d’entrée est
+le protocole, les préférences, `rlog-display.ts` pour la présentation JSON
+réversible de RLOG/1 et la feuille de style isolée. Son point d’entrée est
 `src/log-viewer/index.ts` ; il n’importe aucun fichier de l’application autonome.
 Conserver la notice de la [licence MIT](../../LICENSE) lors de la copie.
 
@@ -26,7 +27,9 @@ crée et ferme sa propre session du compagnon, rouvre automatiquement le dernier
 dossier de sa source, affiche l’arbre et le contenu en direct, et garde les actions
 explicites de téléchargement et de suppression. Seul `RloggerLogsScreen` demande
 la maintenance automatique ; le compagnon vérifie encore l’éligibilité de la
-racine privée. L’écran externe ne montre pas d’avertissement de maintenance.
+racine privée. Il présente aussi les événements JSON RLOG/1 lisiblement par
+défaut, avec retour immédiat au texte brut. L’écran externe reste brut et ne
+montre pas d’avertissement de maintenance.
 
 ## Ajouter les routes et le menu
 

@@ -1,6 +1,6 @@
 # Spécification fonctionnelle du lecteur local
 
-Lecteur 0.5.1 : socle initial conservé. L’extension du protocole 0.3.0 est
+Lecteur 0.5.2 : socle initial conservé. L’extension du protocole 0.3.0 est
 décrite dans
 l’[architecture livrée](ARCHITECTURE-LOCALE.md#gestion-horaire--extension-030),
 le [guide](../README.md) et le [contrat actuel des actions](../../docs/11-actions-fichiers-dossiers.md).
@@ -76,9 +76,13 @@ n’a aucun effet sur l’ordre des lignes lues.
 
 - En-tête avec nom du fichier et état du suivi ; chemin relatif complet accessible
   dans l’infobulle de l’entrée sélectionnée dans l’arbre.
-- Texte brut monospace, fond sombre et contraste lisible, inspirés de CardLog.
-- Espaces, retours à la ligne et ordre du fichier conservés ; aucun rendu HTML ou
-  exécution de séquences terminales provenant du contenu.
+- Texte monospace, fond sombre et contraste lisible, inspirés de CardLog.
+- **Journaux RLOGGER** affiche par défaut les messages JSON des lignes RLOG/1
+  complètes en en-tête lisible et JSON indenté. Le bouton **Voir le texte brut**
+  restitue immédiatement le texte original conservé dans la fenêtre ; le bouton
+  devient **Afficher le JSON lisible**. **Journaux externes** reste brut.
+- En mode brut, espaces, retours à la ligne et ordre du fichier sont conservés.
+  Aucun rendu HTML ou exécution de séquences terminales ne vient du contenu.
 - Texte sélectionnable et copiable, scroll vertical et gestion des lignes longues.
 - Au clic : état de chargement lié à ce fichier, puis contenu récent et suivi actif.
 - Pour un petit fichier, afficher tout le contenu. Pour un gros fichier, ouvrir une
@@ -86,9 +90,12 @@ n’a aucun effet sur l’ordre des lignes lues.
 - « Charger plus ancien » donne accès au contenu précédent sans tout conserver.
 - Fichier vide : état explicite tout en continuant à attendre des ajouts.
 
-La lecture brute n’a besoin d’aucun parseur RLOGGER. Les logs Java ou autres
-fichiers texte restent affichables. Une coloration ou un panneau de contexte
-structuré est une évolution, avec repli sur le texte original si le format est inconnu.
+La projection JSON ne s’applique qu’aux lignes RLOG/1 complètes dont les
+métadonnées et le JSON décodé sont valides. Les autres lignes, y compris une
+dernière ligne partielle, restent brutes. Le disque et le protocole ne changent
+pas ; les champs multiparties ne sont pas fusionnés. Les logs Java et autres
+fichiers texte restent affichables. Le parsing structuré complet FRONT-029
+reste une évolution distincte.
 
 ## Trois comportements distincts
 
@@ -113,7 +120,7 @@ au retour en bas. Ne pas accumuler une file illimitée dans le navigateur.
 
 Option différée à FRONT-028. Les paragraphes suivants
 décrivent son cadrage futur ; aucun réglage de suivi du successeur n’est livré
-dans le lecteur 0.5.1.
+dans le lecteur 0.5.2.
 
 Si activée, suivre une destination précise dans un run et une instance connus.
 Une rotation `http-08.log` → `http-09.log` peut faire changer la sélection et ouvrir

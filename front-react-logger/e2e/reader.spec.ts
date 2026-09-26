@@ -12,7 +12,9 @@ import {
 } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { startService } from "./companion";
+import { displayLines } from "../src/log-viewer/rlog-display";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 let service: Awaited<ReturnType<typeof startService>>;
@@ -58,6 +60,110 @@ const selectedAction = (page: Page, action: string) =>
     .getByRole("button", { name: new RegExp("^" + action + " le fichier ") });
 const content = (page: Page) =>
   page.getByLabel("Contenu du fichier", { exact: true });
+test("RLOG/1 JSON is readable only in the RLOGGER view and raw mode stays exact", async ({
+  page,
+}) => {
+  const example = await readFile(
+    path.join(
+      path.dirname(fileURLToPath(import.meta.url)),
+      "rlog-json-example.log",
+    ),
+    "utf8",
+  );
+  const lines = example.match(/[^\n]*\n/g) ?? [];
+  expect(lines).toHaveLength(2);
+  const first = lines[0]!;
+  const second = lines[1]!;
+  await writeFile(path.join(dir, "event.log"), first);
+  await open(page);
+  await page.getByRole("treeitem", { name: "event.log" }).click();
+  await expect(content(page).locator(".log-line-header")).toContainText(
+    "calendar.stage1.admission_started  ·  #1  ·  15 ms",
+  );
+  await expect(content(page).locator(".log-line-json")).toContainText([
+    "{",
+    '  "attempt": 0,',
+    '  "force": true,',
+    '  "local_day": "2026-09-25",',
+    '  "trigger": "manual_admin"',
+  ]);
+  if (process.env.RLOGGER_VISUAL_DIR)
+    await page.screenshot({
+      path: path.join(
+        process.env.RLOGGER_VISUAL_DIR,
+        `rlog-readable-${test.info().project.name}.png`,
+      ),
+    });
+  const horizontal = await content(page).evaluate((element) => {
+    element.scrollLeft = element.scrollWidth;
+    return { left: element.scrollLeft, width: element.clientWidth };
+  });
+  expect(horizontal.left).toBeGreaterThan(0);
+  expect(horizontal.width).toBeGreaterThan(0);
+  await page.getByRole("button", { name: "Voir le texte brut" }).click();
+  expect(await content(page).locator(".log-lines").textContent()).toBe(first);
+  await page.getByRole("button", { name: "Afficher le JSON lisible" }).click();
+  await appendFile(path.join(dir, "event.log"), second);
+  await expect(content(page).locator(".log-line-header").last()).toContainText(
+    "calendar.stage2  ·  #2  ·  2 ms",
+  );
+  await expect(content(page).locator(".log-line-json").last()).toContainText(
+    "}",
+  );
+  await expect(content(page).locator(".log-lines")).toContainText(
+    "<script>window.bad=true</script>",
+  );
+  expect(await page.evaluate(() => "bad" in window)).toBe(false);
+  await page.getByRole("button", { name: /Journaux externes/ }).click();
+  await open(page);
+  await page.getByRole("treeitem", { name: "event.log" }).click();
+  await expect(
+    page.getByRole("button", { name: "Voir le texte brut" }),
+  ).toHaveCount(0);
+  await expect
+    .poll(() => content(page).locator(".log-lines").textContent())
+    .toBe(first + second);
+});
+test("loading older JSON events preserves the visual scroll anchor", async ({
+  page,
+}) => {
+  const records = Array.from({ length: 800 }, (_, index) => {
+    const message = JSON.stringify({
+      payload: "x".repeat(350),
+      items: [1, 2, 3],
+    })
+      .replaceAll("\\", "\\\\")
+      .replaceAll('"', '\\"');
+    return `RLOG/1 2026-09-25T13:09:20.391Z INFO [LATENCY — 1ms] [seq=${index + 1} instance=calendar source="calendar:runtime.rs:1" action="calendar.tick"] ${message}\n`;
+  });
+  const source = records.join("");
+  await writeFile(path.join(dir, "history-json.log"), source);
+  await open(page);
+  await page.getByRole("treeitem", { name: "history-json.log" }).click();
+  const older = page.getByRole("button", { name: "Charger plus ancien" });
+  await expect(older).toBeEnabled();
+  const range = await page.locator(".reader-toolbar > span").textContent();
+  const start = Number(range?.split(" – ")[0]);
+  expect(start).toBeGreaterThan(0);
+  await content(page).evaluate((element) => {
+    element.scrollTop = 0;
+    element.dispatchEvent(new Event("scroll", { bubbles: true }));
+  });
+  await older.click();
+  await expect(page.locator(".reader-toolbar > span")).toContainText("0 – ");
+  const physicalAdded = Buffer.from(source, "utf8")
+    .subarray(0, start)
+    .filter((byte) => byte === 10).length;
+  const expectedTop =
+    displayLines(source, true).physicalStarts[physicalAdded]! * 22;
+  await expect
+    .poll(() => content(page).evaluate((element) => element.scrollTop))
+    .toBeGreaterThan(expectedTop - 22);
+  const actualTop = await content(page).evaluate(
+    (element) => element.scrollTop,
+  );
+  expect(Math.abs(actualTop - expectedTop)).toBeLessThan(22);
+});
 test("source menu keeps separate paths and omits maintenance warning for external logs", async ({
   page,
 }) => {

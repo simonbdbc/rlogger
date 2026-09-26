@@ -149,6 +149,10 @@ fn fixtures(directory: Option<&str>, large: bool, managed: bool) -> Result {
         );
         for (relative, text) in [
             (
+                "rlog-json-example.log",
+                include_str!("../../front-react-logger/e2e/rlog-json-example.log"),
+            ),
+            (
                 "1970-01-01/test/archive-00-1-2-3-h0-s1.log",
                 "Archive téléchargeable 🦀\n",
             ),

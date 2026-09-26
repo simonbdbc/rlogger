@@ -2,9 +2,12 @@
 
 Propriétaire : RLOGGER 0.2.0 (grammaire RLOG/1 inchangée). Le package
 `rlogger` succède à `ordered-local-logger` sans modifier les lignes RLOG/1.
-Le lecteur brut reste indépendant du format.
-Le préfixe de chaque ligne est `RLOG/1`, version identifiable pour un éventuel parseur.
-Le parseur structuré FRONT-029 reste différé.
+Le mode brut du lecteur reste indépendant du format. Le préfixe de chaque ligne
+est `RLOG/1`. Dans le navigateur, le parcours **Journaux RLOGGER** peut
+présenter le message JSON d’une ligne complète et valide avec une indentation
+et un en-tête lisible ; **Journaux externes** et le bouton **Voir le texte brut**
+conservent la représentation textuelle. Le format disque et le protocole ne
+changent pas. Le parseur structuré complet FRONT-029 reste différé.
 
 Exemples exacts validés par `shared_contract_fixture_matches_writer` :
 
@@ -39,8 +42,10 @@ texte sont entre guillemets ; booléens et entiers sont typés en décimal ; flo
 finis avec représentation Rust Debug, `-0.0` distinct de `0.0`.
 
 Échappement : antislash `\\`, guillemet `\"`, LF `\n`, CR `\r`, tabulation `\t`,
-autres contrôles et séparateurs U+2028/U+2029 `\u{hex}`. Le lecteur affiche ces octets
-comme texte, sans interpréter des séquences de terminal, du HTML ou du code.
+autres contrôles et séparateurs U+2028/U+2029 `\u{hex}`. La présentation JSON
+du lecteur décode ces échappements uniquement pour une ligne reconnue, puis
+applique `JSON.parse` ; en cas d’échec, elle garde la ligne brute. Le navigateur
+n’interprète jamais le contenu comme terminal, HTML ou code.
 
 Contrôle de surcharge : niveau WARN, `source=logger`, message `OVERLOAD refused=N`,
 séquence et capture propres au résumé, LATENCY présente. Il ne reconstruit pas les

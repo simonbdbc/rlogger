@@ -1,6 +1,6 @@
 # Architecture locale et contrat de lecture v1
 
-Lecteur 0.5.1, compagnon Rust 0.3.1, logger 0.2.0 ; protocole v1 étendu pour
+Lecteur 0.5.2, compagnon Rust 0.3.2, logger 0.2.0 ; protocole v1 étendu pour
 la gestion horaire.
 [Guide de lancement](../README.md), [types partagés](../src/log-viewer/protocol.ts),
 [intégration Expo web](INTEGRATION-EXPO.md).
@@ -105,7 +105,7 @@ entre deux observations restent hors garantie append-only.
 | Snapshot / historique | 256 Kio par lecture, descripteur fermé immédiatement après |
 | Direct | 64 Kio/bloc ; polling 250 ms au repos, rattrapage immédiat après ack |
 | Réseau | Un bloc non acquitté, buffer de sortie borné à 1 Mio ; ack absent 10 s = fermeture/resync |
-| Vue | 1 Mio d’octets, 20 000 lignes ; index et texte dérivés également bornés, rendu virtualisé |
+| Vue | 1 Mio d’octets, 20 000 lignes physiques ; projection JSON en lignes visuelles, rendu DOM virtualisé |
 | Transitoires | Buffers bruts, base64 (~4/3), texte UTF-16 et copies de fenêtre s’ajoutent aux octets utiles |
 
 Ces plafonds ne sont pas un plafond RSS global. Les bibliothèques, le navigateur,
@@ -137,16 +137,30 @@ En lecture historique les nouveaux blocs sont acquittés sans accumulation ; une
 indication de nouveaux octets permet de relire la fin sur disque. Copier porte sur
 le texte rendu, jamais sur tout le fichier non chargé.
 
+`viewer-store.ts` conserve la fenêtre de texte décodé comme référence. Dans le
+navigateur, `rlog-display.ts` projette les lignes RLOG/1 complètes et valides
+dont le message est du JSON : décodage des seuls échappements RLOG/1, puis
+`JSON.parse` et indentation sur deux espaces. Les lignes non reconnues et les
+fragments aux bords de la fenêtre restent bruts. **Journaux externes** ne lance
+pas cette projection. Le bouton du parcours RLOGGER commute entre projection et
+texte brut sans requête ni nouvelle session ; aucun octet du fichier ne change.
+Chaque ligne physique possède un indice de début dans les lignes visuelles.
+Virtualisation, largeur et hauteur utilisent les lignes visuelles ; lors d’un
+chargement d’historique, le nombre de lignes physiques ajoutées est converti
+par cet indice pour préserver l’ancre de défilement. Le texte est rendu par
+React, jamais interprété comme HTML, ANSI ou script.
+
 Le suivi du scroll s’applique seulement en bas. Le clic manuel garde la sélection,
 y compris après rotation. Clavier, séparateur ajustable, panneaux indépendants ;
 à 390 px, arbre au-dessus du lecteur. Les deux chemins, le parcours sélectionné
 et la largeur sont mémorisés localement.
-FRONT-028–030 (successeur, mode structuré, recherche entière) restent différés.
-Le format RLOG/1 est du texte ordinaire pour ce lecteur.
+FRONT-028–030 (successeur, parsing structuré complet, recherche entière) restent
+différés. La projection JSON par ligne n’interprète ni `part`/`last_part` ni les
+groupes et ne clôt pas FRONT-029 ; le texte brut reste accessible.
 
 ## Gestion horaire — extension 0.3.0
 
-Le lecteur 0.5.1 utilise le compagnon 0.3.1 pour ces DTO additionnels ; HTTP/WS
+Le lecteur 0.5.2 utilise le compagnon 0.3.2 pour ces DTO additionnels ; HTTP/WS
 et les tranches existantes conservent la version 1. Le logger reste indépendant.
 
 | Opération | Route | Contrat |

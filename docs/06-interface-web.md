@@ -111,10 +111,16 @@ borne de texte ne fait partie du contrat du lecteur.
 
 ## Ordre, latence et temps réel
 
-Le mode brut conserve l’ordre des octets et lignes du fichier. Aucun tri par heure,
+Le mode brut conserve l’ordre des lignes et le texte décodé du fichier ; les
+offsets demeurent des positions en octets. Aucun tri par heure,
 aucune nouvelle déduplication, aucun marqueur technique injecté dans les logs.
-LATENCY et `x23` sont affichés tels qu’écrits. Une vue structurée facultative pourra
-les interpréter plus tard, sans inventer les détails perdus par regroupement.
+Dans **Journaux RLOGGER**, une présentation réversible affiche en en-tête
+`LATENCY`, l’action et la séquence des lignes RLOG/1 complètes dont le message
+est du JSON valide, puis indente ce JSON. Les autres lignes restent brutes ;
+**Journaux externes** est toujours brut. Le bouton de bascule restitue les
+lignes originales sans toucher au fichier. `x23` et les champs multiparties
+ne sont pas fusionnés ; FRONT-029 garde le périmètre d’un parsing structuré
+complet, sans inventer les détails perdus par regroupement.
 
 Le délai de lecture du frontend s’ajoute à celui d’écriture du logger. Il doit être
 mesuré séparément ; le lecteur ne remplace pas LATENCY par son propre retard et

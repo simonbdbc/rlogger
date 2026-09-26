@@ -1,4 +1,4 @@
-# Compagnon local Rust — 0.3.1
+# Compagnon local Rust — 0.3.2
 
 Binaire autonome Rust 1.95+, Axum/Tokio. Il sert le build Expo et lit les fichiers
 sur la même machine. En mode statique, aucun runtime Node ni Python n’est

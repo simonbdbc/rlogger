@@ -433,19 +433,28 @@
   min-height: 52px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  flex-wrap: wrap;
   gap: 12px;
   padding: 8px 22px;
   border-bottom: 1px solid #34434d;
+}
+
+.rlogger-viewer .reader-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 
 .rlogger-viewer .reader-toolbar > span {
   font-size: 12px;
   color: #9eacb6;
   white-space: nowrap;
+  margin-left: auto;
 }
 
-.rlogger-viewer .reader-toolbar > [role="button"] {
+.rlogger-viewer .reader-toolbar-actions > [role="button"] {
   align-self: center;
 }
 
@@ -494,6 +503,19 @@
   color: #a3dfa5;
   tab-size: 4;
   user-select: text;
+}
+
+.rlogger-viewer .log-line-header {
+  color: #9ddbf8;
+  font-weight: 650;
+}
+
+.rlogger-viewer .log-line-json {
+  color: #d5e8f2;
+}
+
+.rlogger-viewer .log-line-separator {
+  color: inherit;
 }
 
 .rlogger-viewer .reader-empty {
@@ -613,17 +635,18 @@
   .rlogger-viewer .reader-toolbar {
     padding: 6px 16px;
     min-height: 46px;
+    gap: 6px;
   }
 
   .rlogger-viewer .reader-toolbar > span {
     font-size: 10px;
   }
 
-  .rlogger-viewer .reader-toolbar > [role="button"] {
+  .rlogger-viewer .reader-toolbar-actions > [role="button"] {
     padding: 7px !important;
   }
 
-  .rlogger-viewer .reader-toolbar > [role="button"] > div {
+  .rlogger-viewer .reader-toolbar-actions > [role="button"] > div {
     font-size: 12px !important;
   }
 
@@ -665,7 +688,7 @@
 
 .rlogger-viewer .tree-toolbar > [role="button"],
 .rlogger-viewer .path-toolbar > [role="button"],
-.rlogger-viewer .reader-toolbar > [role="button"],
+.rlogger-viewer .reader-toolbar-actions > [role="button"],
 .rlogger-viewer .footer-right > [role="button"] {
   align-self: center !important;
 }

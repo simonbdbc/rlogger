@@ -1,6 +1,6 @@
 # Documentation du lecteur local
 
-Lecteur 0.5.1 / compagnon 0.3.1 : consultation générique, actions explicites
+Lecteur 0.5.2 / compagnon 0.3.2 : consultation générique, actions explicites
 sur les fichiers et dossiers, et maintenance du stockage horaire privé.
 [Guide utilisateur](../README.md), [contrat actuel des actions](../../docs/11-actions-fichiers-dossiers.md).
 

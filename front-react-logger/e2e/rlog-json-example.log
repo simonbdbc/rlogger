@@ -1,0 +1,2 @@
+RLOG/1 2026-09-25T13:09:20.391Z INFO [LATENCY — 15ms] [seq=1 instance=calendar source="calendar_workflow:src/features/calendar_day/native/runtime.rs:145" action="calendar.stage1.admission_started" event_id=1] {\"attempt\":0,\"force\":true,\"local_day\":\"2026-09-25\",\"trigger\":\"manual_admin\"}
+RLOG/1 2026-09-25T13:09:21.391Z WARN [LATENCY — 2ms] [seq=2 instance=calendar source="calendar_workflow:src/features/calendar_day/native/runtime.rs:146" action="calendar.stage2"] {\"html\":\"<script>window.bad=true</script>\",\"rows\":[1,2]}

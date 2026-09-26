@@ -1,5 +1,12 @@
 # Changelog du lecteur et compagnon
 
+## Lecteur 0.5.2 / compagnon 0.3.2 — 26 septembre 2026
+
+- Dans **Journaux RLOGGER**, présentation lisible et réversible des lignes RLOG/1 complètes dont le message est du JSON valide ; **Journaux externes** reste brut.
+- En-tête avec horodatage, niveau, action, séquence et LATENCY, puis JSON indenté ; repli sur la ligne brute en cas d’échec et aucun changement du fichier.
+- Virtualisation et ancre d’historique adaptées aux lignes visuelles ; tests unitaires et navigateur associés.
+- Exemple RLOG/1 partagé par le test navigateur et le générateur de journaux synthétiques gérés.
+
 ## Lecteur 0.5.1 / compagnon 0.3.1 — 24 septembre 2026
 
 - Arbre et pagination triés par nom décroissant dans chaque dossier, pour les fichiers et les dossiers ; le contenu des journaux conserve son ordre de lecture.

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Local Logs",
     "slug": "local-logs",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "scheme": "local-logs",
     "platforms": ["web"],
     "web": { "bundler": "metro", "output": "single" },
